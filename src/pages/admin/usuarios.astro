@@ -14,6 +14,7 @@ const [usersResult, businessesResult] = await Promise.all([
 const users = usersResult.error ? [] : usersResult.data.users;
 const businesses = (businessesResult.data ?? []) as Business[];
 const error = Astro.url.searchParams.get('error');
+const ok = Astro.url.searchParams.get('ok');
 
 const owns = (userId: string) =>
   businesses.filter((b) => b.owner_id === userId);
@@ -21,6 +22,7 @@ const owns = (userId: string) =>
 
 <DashboardLayout title="Gestionar usuarios" role="admin" active="/admin/usuarios">
   {error && <div class="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
+  {ok && <div class="mb-4 rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{ok}</div>}
 
   <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
     <table class="min-w-full divide-y divide-gray-200">
@@ -41,6 +43,11 @@ const owns = (userId: string) =>
               <td class="px-4 py-3 text-sm">
                 <p class="font-medium text-gray-900">{u.email}</p>
                 <p class="text-xs text-gray-400">{u.email_confirmed_at ? 'Verificado' : 'Sin confirmar'}</p>
+                {role !== 'admin' && (
+                  <span class={`mt-1 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${u.app_metadata?.approved === false ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'}`}>
+                    {u.app_metadata?.approved === false ? 'Pendiente de aprobaci\u00f3n' : 'Aprobado'}
+                  </span>
+                )}
               </td>
               <td class="px-4 py-3">
                 <span class={`rounded-full px-2 py-0.5 text-xs font-medium ${role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600'}`}>
@@ -64,6 +71,15 @@ const owns = (userId: string) =>
                     </select>
                     <button type="submit" class="rounded-lg border border-emerald-200 px-3 py-1.5 text-sm text-emerald-700 hover:bg-emerald-50">
                       Asignar
+                    </button>
+                  </form>
+                )}
+
+                {role !== 'admin' && u.app_metadata?.approved === false && u.email_confirmed_at && (
+                  <form method="POST" action="/api/admin/users/approve" class="mt-2 flex justify-end">
+                    <input type="hidden" name="user_id" value={u.id} />
+                    <button type="submit" class="rounded-lg border border-amber-300 px-3 py-1.5 text-sm font-semibold text-amber-700 hover:bg-amber-50">
+                      Aprobar alta
                     </button>
                   </form>
                 )}

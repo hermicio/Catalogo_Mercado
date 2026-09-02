@@ -71,9 +71,20 @@ export const POST: APIRoute = async (context) => {
     }
   }
 
+  // Marcar la cuenta como pendiente de aprobación del administrador.
+  // Se guarda en app_metadata (solo editable con service role -> a prueba de manipulación).
+  if (userId) {
+    const { error: approveError } = await admin.auth.admin.updateUserById(userId, {
+      app_metadata: { role: 'puestero', approved: false },
+    });
+    if (approveError) {
+      console.error('Fallo marcando cuenta como pendiente de aprobación:', approveError.message);
+    }
+  }
+
   // In local dev (sin confirmación de email) la sesión se crea al instante.
   if (data.session) {
-    return context.redirect('/misnegocios?mensaje=Bienvenido!%20Tu%20negocio%20se%20creó%20y%20está%20pendiente%20de%20aprobación');
+    return context.redirect('/pendiente');
   }
 
   return context.redirect('/login?mensaje=Registro%20completado.%20Revisa%20tu%20correo%20para%20confirmar.');

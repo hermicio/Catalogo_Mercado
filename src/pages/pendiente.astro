@@ -1,0 +1,23 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Cuenta pendiente de aprobaci\u00f3n">
+  <div class="mx-auto max-w-md px-4 py-16">
+    <div class="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm text-center">
+      <div class="mx-auto grid h-14 w-14 place-items-center rounded-full bg-amber-100 text-2xl">&#9203;</div>
+      <h1 class="mt-4 text-2xl font-bold text-gray-900">Cuenta pendiente de aprobaci\u00f3n</h1>
+      <p class="mt-4 text-sm text-gray-600">
+        Tu cuenta se cre\u00f3 correctamente y tu correo ya fue verificado. A\u00fan est\u00e1
+        <strong>pendiente de aprobaci\u00f3n del administrador</strong>. En cuanto sea aprobada,
+        podr\u00e1s iniciar sesi\u00f3n con normalidad.
+      </p>
+      <a
+        href="/login"
+        class="mt-6 inline-block rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
+      >
+        Volver al inicio de sesi\u00f3n
+      </a>
+    </div>
+  </div>
+</Layout>
