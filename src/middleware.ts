@@ -18,6 +18,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     pathname.startsWith('/negocio/') ||
     pathname === '/login' ||
     pathname === '/registro' ||
+    pathname === '/auth/confirm' ||
     pathname === '/api/auth/login' ||
     pathname === '/api/auth/register' ||
     pathname.startsWith('/_astro') ||

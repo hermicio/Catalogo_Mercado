@@ -1,6 +1,8 @@
 ---
-import Layout from '../layouts/Layout.astro';
+import Layout from '../../layouts/Layout.astro';
 
+const SUPABASE_URL = import.meta.env.SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.SUPABASE_ANON_KEY;
 const error = Astro.url.searchParams.get('error') ?? 'Procesando confirmaci\u00f3n de tu correo...';
 ---
 
@@ -13,26 +15,32 @@ const error = Astro.url.searchParams.get('error') ?? 'Procesando confirmaci\u00f
   </div>
 </Layout>
 
-<script>
-  import { createClient } from '../lib/supabase-auth-client';
+<script define:vars={{ supabaseUrl: SUPABASE_URL, supabaseAnonKey: SUPABASE_ANON_KEY }}>
+  import { createClient } from '@supabase/supabase-js';
 
   (async () => {
     const estado = document.getElementById('estado');
     if (!estado) return;
-    const hash = window.location.hash;
 
-    const params = new URLSearchParams(hash.startsWith('#') ? hash.slice(1) : hash);
-    const tokenHash = params.get('token_hash');
-    const type = params.get('type');
-    const next = params.get('next') ?? '/misnegocios';
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+    const url = new URL(window.location.href);
+
+    let tokenHash = url.searchParams.get('token_hash');
+    let type = url.searchParams.get('type');
+    let next = url.searchParams.get('next') ?? '/misnegocios';
+
+    if (url.hash.length > 1) {
+      const hashParams = new URLSearchParams(url.hash.slice(1));
+      if (!tokenHash) tokenHash = hashParams.get('token_hash');
+      if (!type) type = hashParams.get('type');
+      if (!next) next = hashParams.get('next') ?? '/misnegocios';
+    }
 
     if (!tokenHash || !type) {
       estado.textContent =
         'El enlace de confirmaci\u00f3n es inv\u00e1lido o ya expir\u00f3. Solicita un nuevo enlace o vuelve a registrarte.';
       return;
     }
-
-    const supabase = createClient();
 
     const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type });
 

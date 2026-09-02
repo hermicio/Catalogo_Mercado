@@ -40,10 +40,10 @@ export const POST: APIRoute = async (context) => {
       },
       emailRedirectTo:
         context.site
-          ? new URL('/confirm', context.site).toString()
+          ? new URL('/auth/confirm', context.site).toString()
           : import.meta.env.SITE_URL
-            ? `${import.meta.env.SITE_URL}/confirm`
-            : 'http://localhost:4321/confirm',
+            ? `${import.meta.env.SITE_URL}/auth/confirm`
+            : 'http://localhost:4321/auth/confirm',
     },
   });
 
