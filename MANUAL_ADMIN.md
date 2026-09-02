@@ -23,7 +23,7 @@ En la columna izquierda del panel aparecen estas secciones:
 |---|---|
 | **Resumen** | Indicadores generales (negocios totales/publicados, usuarios, catálogos pendientes) y accesos rápidos. |
 | **Negocios** | Crear, editar, publicar/ocultar y configurar la aprobación de productos de cada negocio. |
-| **Usuarios** | Ver los puesteros registrados y asignarles (o quitarles) un negocio. |
+| **Usuarios** | Aprobar las altas de puesteros nuevos, ver los registrados y asignarles (o quitarles) un negocio. |
 | **Catálogos** | Aprobar/rechazar los catálogos PDF que suben los puesteros. |
 | **Productos** | Aprobar productos, marcarlos en liquidación y ocultarlos/eliminarlos. |
 | **Página principal** | Editar el título, subtítulo y foto de fondo de la portada de la home. |
@@ -78,6 +78,17 @@ Muestra todos los usuarios registrados con:
 - **Email** y estado de verificación (Verificado / Sin confirmar).
 - **Rol** (Administrador o Puestero).
 - **Negocios** que tiene asignados.
+- **Estado de aprobación** (Pendiente de aprobación / Aprobado).
+
+### Aprobar el alta de un puestero (importante)
+
+Cuando alguien crea una cuenta y confirma su correo, su cuenta queda **pendiente de aprobación** y no puede iniciar sesión hasta que se la habilites.
+
+1. En la fila del usuario aparece el badge **“Pendiente de aprobación”** (ámbar).
+2. Tocá el botón **“Aprobar alta”** (solo aparece para puesteros con correo verificado y pendientes).
+3. A partir de ese momento el puestero puede iniciar sesión con normalidad.
+
+> Solo se puede aprobar un alta si el correo ya fue **verificado** (el usuario recibió y pulsó el enlace de confirmación). Si aún figura “Sin confirmar”, esperá a que confirme primero.
 
 ### Asignar / quitar negocio a un puestero
 1. En la fila del usuario (que no sea admin), el desplegable muestra los negocios sin dueño (o el que ya tiene).
@@ -148,7 +159,7 @@ Tocá **“Eliminar”** en la fila correspondiente y confirmá. Las fechas pasa
 
 ## 10. Consejos y buenas prácticas
 
-- **Revisá los pendientes seguido**: catálogos y productos pendientes representan trabajo de los puesteros esperando tu aprobación.
+- **Revisá los pendientes seguido**: altas de puesteros, catálogos y productos pendientes representan trabajo esperando tu aprobación.
 - **Probalo todo en la vista pública**: cada vez que publiques/ocultes algo, entrá a “Ver sitio público” para confirmar cómo se ve.
 - **Usá la aprobación automática con criterio**: es útil para puesteros de confianza que publican mucho, pero dejá “Requiere admin” donde quieras mantener control de calidad.
 - **No compartas la contraseña del admin** ni la clave `service_role` de Supabase. En el dashboard de Supabase podés regenerar o cambiar credenciales si alguna se expone.
@@ -157,9 +168,10 @@ Tocá **“Eliminar”** en la fila correspondiente y confirmá. Las fechas pasa
 
 ## Anexo: flujo de un negocio de punta a punta
 
-1. Un **puestero** se registra en la web → su negocio se crea **oculto** (pendiente).
-2. Como **admin**, en **Negocios** tocá **“Publicar”** para mostrarlo.
-3. El puestero sube **catálogos** (quedan pendientes) y/o **productos** (según el modo de aprobación del negocio).
-4. Como admin, aprobás catálogos en **Catálogos** y productos en **Productos** (si aplica), y marcás liquidaciones si corresponde.
-5. Opcional: cargás **fechas de ferias** y ajustás la **portada**.
-6. Todo lo aprobado se refleja al instante en la página pública.
+1. Un **puestero** se registra en la web y confirma su correo. Su cuenta queda **pendiente de aprobación**.
+2. Como **admin**, en **Usuarios** tocá **“Aprobar alta”** para habilitar su acceso. Su negocio se creó **oculto** (pendiente de publicación).
+3. Como **admin**, en **Negocios** tocá **“Publicar”** para mostrarlo.
+4. El puestero sube **catálogos** (quedan pendientes) y/o **productos** (según el modo de aprobación del negocio).
+5. Como admin, aprobás catálogos en **Catálogos** y productos en **Productos** (si aplica), y marcás liquidaciones si corresponde.
+6. Opcional: cargás **fechas de ferias** y ajustás la **portada**.
+7. Todo lo aprobado se refleja al instante en la página pública.
