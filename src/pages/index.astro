@@ -23,8 +23,8 @@ const saleProducts = (saleResult.data ?? []) as unknown as (Product & { business
 const ferias = (fairResult.data ?? []) as FairDate[];
 const nearest = ferias[0] ?? null;
 
-const heroTitle = home?.home_title || 'Los catálogos de tu local, todos juntos';
-const heroSubtitle = home?.home_subtitle || 'Explora los negocios del local, selecciona uno y mira su catálogo en línea o descárgalo en PDF.';
+const heroTitle = home?.home_title || 'Feria de Emprendedores';
+const heroSubtitle = home?.home_subtitle || 'Explora los emprendimientos de la feria, selecciona uno y mira su catálogo en línea o descárgalo en PDF.';
 const heroImage = home?.hero_image_url;
 
 const fmt = (n: number) => '$' + Number(n).toLocaleString('es-AR', { minimumFractionDigits: 2 });

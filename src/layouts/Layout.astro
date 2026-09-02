@@ -17,9 +17,9 @@ const role = getRole(user);
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content={description ?? 'Catálogos de los negocios del local'} />
+    <meta name="description" content={description ?? 'Feria de Emprendedores'} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>{title ? `${title} · ` : ''}Catálogos del Local</title>
+    <title>{title ? `${title} · ` : ''}Feria de Emprendedores</title>
   </head>
   <body class="min-h-screen bg-gray-50">
     <Header user={user} role={role} />
@@ -28,7 +28,7 @@ const role = getRole(user);
     </main>
     <footer class="border-t border-gray-200 bg-white py-8 mt-16">
       <div class="mx-auto max-w-6xl px-4 text-center text-sm text-gray-500">
-        © {new Date().getFullYear()} Catálogos del Local · Todos los derechos reservados
+        © {new Date().getFullYear()} Feria de Emprendedores · Todos los derechos reservados
       </div>
     </footer>
   </body>
