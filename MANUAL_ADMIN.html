@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><title>Manual de Administrador</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; color: #1f2937; margin: 40px; font-size: 13px; line-height: 1.55; }
+  h1 { color: #059669; font-size: 26px; border-bottom: 3px solid #059669; padding-bottom: 10px; }
+  h2 { color: #047857; font-size: 18px; border-bottom: 1px solid #d1d5db; padding-bottom: 5px; margin-top: 28px; }
+  h3 { color: #065f46; font-size: 15px; margin-top: 20px; }
+  strong { color: #111827; }
+  code { background: #f3f4f6; padding: 1px 5px; border-radius: 4px; font-family: Consolas, monospace; font-size: 12px; color: #be123c; }
+  pre { background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 6px; padding: 12px; overflow-x: hidden; white-space: pre-wrap; }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0; }
+  th, td { border: 1px solid #d1d5db; padding: 7px 10px; text-align: left; vertical-align: top; }
+  th { background: #ecfdf5; color: #065f46; }
+  li { margin: 3px 0; }
+  a { color: #059669; }
+  .page-break { page-break-before: always; }
+</style></head><body>
+<h1>Manual de Administrador — Catálogos del Local</h1>
+<p>Guía de uso del <strong>panel de administración</strong> para gestionar la web "Catálogos del Local": los negocios del edificio/local, sus catálogos PDF, productos a la venta, liquidaciones, fechas de ferias y el contenido de la portada.</p>
+<p>---</p>
+<h2>1. Acceso al panel</h2>
+<ol>
+<li>Entrá a la web (ej. <code>https://catalogo-mercado-eqbl.vercel.app</code>).</li>
+<li>Tocá <strong>"Iniciar sesión"</strong> (arriba a la derecha).</li>
+<li>Ingresá con el <strong>email y contraseña del administrador</strong>.</li>
+<li>Si el usuario tiene rol <code>admin</code>, entra directo al <strong>Panel de administración</strong> (<code>/admin/dashboard</code>). Si el rol es de puestero, va a su propio panel (no al de admin).</li>
+</ol>
+<p>> Solo los usuarios con <code>rol: admin</code> ven el menú de administración. Un usuario puestero no puede acceder a <code>/admin/*</code>.</p>
+<p>---</p>
+<h2>2. El menú del administrador</h2>
+<p>En la columna izquierda del panel aparecen estas secciones:</p>
+<table>
+<thead><tr><th>Sección</th><th>¿Para qué sirve?</th></tr></thead>
+<tbody>
+<tr><td>---</td><td>---</td></tr>
+<tr><td><strong>Resumen</strong></td><td>Indicadores generales (negocios totales/publicados, usuarios, catálogos pendientes) y accesos rápidos.</td></tr>
+<tr><td><strong>Negocios</strong></td><td>Crear, editar, publicar/ocultar y configurar la aprobación de productos de cada negocio.</td></tr>
+<tr><td><strong>Usuarios</strong></td><td>Ver los puesteros registrados y asignarles (o quitarles) un negocio.</td></tr>
+<tr><td><strong>Catálogos</strong></td><td>Aprobar/rechazar los catálogos PDF que suben los puesteros.</td></tr>
+<tr><td><strong>Productos</strong></td><td>Aprobar productos, marcarlos en liquidación y ocultarlos/eliminarlos.</td></tr>
+<tr><td><strong>Página principal</strong></td><td>Editar el título, subtítulo y foto de fondo de la portada de la home.</td></tr>
+<tr><td><strong>Ferias</strong></td><td>Cargar y eliminar las fechas de las próximas ferias que se muestran en la home.</td></tr>
+<tr><td><strong>Ver sitio público</strong></td><td>Abrir la web tal como la ve el visitante.</td></tr>
+</table>
+<p>---</p>
+<h2>3. Resumen</h2>
+<p>Sirve como tablero de control. Muestra:</p>
+<ul>
+<li><strong>Negocios totales</strong> y <strong>negocios publicados</strong>.</li>
+<li><strong>Usuarios (puesteros)</strong> registrados.</li>
+<li><strong>Catálogos pendientes</strong> de aprobación.</li>
+</ul>
+<p>Desde acá hay accesos directos a gestionar negocios, aprobar catálogos y gestionar usuarios.</p>
+<p>---</p>
+<h2>4. Gestionar negocios (<code>/admin/negocios</code>)</h2>
+<h3>4.1 Crear un negocio</h3>
+<ol>
+<li>En <strong>“Crear nuevo negocio”</strong> completá:</li>
+</ol>
+<p>- <strong>Nombre</strong> (obligatorio).</p>
+<p>- <strong>Dirección / local</strong> (opcional).</p>
+<p>- <strong>Descripción</strong> (opcional).</p>
+<ol>
+<li>Tocá <strong>“Crear negocio”</strong>. Aparece en la tabla.</li>
+</ol>
+<h3>4.2 Publicar / ocultar un negocio</h3>
+<p>Cada negocio tiene un estado <strong>Publicado</strong> u <strong>Oculto</strong>. Solo los negocios publicados se ven en la página pública.</p>
+<ul>
+<li>Botón <strong>“Publicar”</strong>: lo hace visible en la home.</li>
+<li>Botón <strong>“Ocultar”</strong>: lo saca de la vista pública (sin borrarlo).</li>
+</ul>
+<h3>4.3 Editar un negocio</h3>
+<p>Tocá <strong>“Editar”</strong> para modificar nombre, dirección, horario, teléfono, descripciones e imágenes (representativa y de portada).</p>
+<h3>4.4 Aprobación de productos (importante)</h3>
+<p>Cada negocio tiene un parámetro de <strong>aprobación de productos</strong>:</p>
+<ul>
+<li><strong>Automática</strong>: los productos que cargue ese puestero se publican al instante (sin revisión del admin).</li>
+<li><strong>Requiere admin</strong>: los productos quedan <strong>pendientes</strong> hasta que el admin los apruebe en la sección <strong>Productos</strong>.</li>
+</ul>
+<p>Usá el botón <strong>“Cambiar”</strong> junto a ese badge para alternar entre ambos modos por negocio.</p>
+<p>---</p>
+<h2>5. Gestionar usuarios (<code>/admin/usuarios</code>)</h2>
+<p>Muestra todos los usuarios registrados con:</p>
+<ul>
+<li><strong>Email</strong> y estado de verificación (Verificado / Sin confirmar).</li>
+<li><strong>Rol</strong> (Administrador o Puestero).</li>
+<li><strong>Negocios</strong> que tiene asignados.</li>
+</ul>
+<h3>Asignar / quitar negocio a un puestero</h3>
+<ol>
+<li>En la fila del usuario (que no sea admin), el desplegable muestra los negocios sin dueño (o el que ya tiene).</li>
+<li>Seleccioná un negocio y tocá <strong>“Asignar”</strong>. Ese puestero pasa a administrar ese negocio.</li>
+<li>Para quitarle el negocio, elegí <strong>“Sin negocio”</strong> y tocá “Asignar”.</li>
+</ol>
+<p>> Los usuarios con rol <code>admin</code> no se pueden reasignar desde esta tabla.</p>
+<p>---</p>
+<h2>6. Aprobar catálogos (<code>/admin/catalogos</code>)</h2>
+<p>Los puesteros suben catálogos PDF que quedan <strong>pendientes</strong> hasta esta revisión.</p>
+<ul>
+<li><strong>Aprobar</strong> → el catálogo se publica y aparece en la página pública del negocio.</li>
+<li><strong>Rechazar</strong> / ocultar → el catálogo no se muestra.</li>
+</ul>
+<p>Publicá únicamente catálogos que correspondan realmente al negocio y estén completos/correctos.</p>
+<p>---</p>
+<h2>7. Gestionar productos (<code>/admin/productos</code>)</h2>
+<h3>7.1 Pendientes de aprobación</h3>
+<p>Lista los productos creados por puesteros cuya aprobación <strong>requiere admin</strong>:</p>
+<ul>
+<li><strong>Aprobar</strong> → el producto se hace visible en el negocio.</li>
+<li><strong>Rechazar</strong> → se mantiene oculto.</li>
+</ul>
+<h3>7.2 Publicados</h3>
+<p>Tabla con los productos visibles y sus acciones:</p>
+<ul>
+<li><strong>Marcar en liquidación</strong> / <strong>Quitar liquidación</strong> → activa/desactiva el atributo de oferta del producto (se resalta con borde rojo en el negocio y aparece en la cinta de liquidaciones de la home).</li>
+<li><strong>Ocultar</strong> / <strong>Eliminar</strong>.</li>
+</ul>
+<p>> Recordá: si un negocio tiene la aprobación de productos en modo <strong>Automática</strong> (ver sección 4.4), sus productos entran directo a publicados sin pasar por “Pendientes”.</p>
+<p>---</p>
+<h2>8. Página principal (<code>/admin/portada</code>)</h2>
+<p>Sirve para editar el contenido de la home sin tocar código:</p>
+<ul>
+<li><strong>Título principal</strong>: el encabezado grande.</li>
+<li><strong>Subtítulo</strong>: el texto debajo del título.</li>
+<li><strong>Imagen de fondo / portada</strong>: subí una foto (queda de fondo con un velo blanco para legibilidad).</li>
+</ul>
+<p>- Para <strong>quitar</strong> la imagen actual: marcá <em>“Quitar la imagen actual”</em>.</p>
+<p>Al guardar, tocá <strong>“Ver la página principal”</strong> para comprobar el resultado.</p>
+<p>---</p>
+<h2>9. Fechas de ferias (<code>/admin/ferias</code>)</h2>
+<p>Controla el apartado “Próximas fechas de ferias” de la home.</p>
+<h3>Agregar una fecha</h3>
+<ol>
+<li>Elegí la <strong>fecha</strong> en el calendario.</li>
+<li>Opcional: <strong>título</strong> (ej. “Feria del Local”) y <strong>descripción</strong>.</li>
+<li>Tocá <strong>“Agregar fecha”</strong>.</li>
+</ol>
+<h3>Resultado en la home</h3>
+<ul>
+<li>Se muestran las <strong>próximas</strong> fechas (desde hoy en adelante), ordenadas por cercanía.</li>
+<li>La <strong>más próxima</strong> aparece resaltada con el cartel “Más próxima”.</li>
+</ul>
+<h3>Eliminar una fecha</h3>
+<p>Tocá <strong>“Eliminar”</strong> en la fila correspondiente y confirmá. Las fechas pasadas se marcan igual pero solo se muestran las futuras en la home.</p>
+<p>---</p>
+<h2>10. Consejos y buenas prácticas</h2>
+<ul>
+<li><strong>Revisá los pendientes seguido</strong>: catálogos y productos pendientes representan trabajo de los puesteros esperando tu aprobación.</li>
+<li><strong>Probalo todo en la vista pública</strong>: cada vez que publiques/ocultes algo, entrá a “Ver sitio público” para confirmar cómo se ve.</li>
+<li><strong>Usá la aprobación automática con criterio</strong>: es útil para puesteros de confianza que publican mucho, pero dejá “Requiere admin” donde quieras mantener control de calidad.</li>
+<li><strong>No compartas la contraseña del admin</strong> ni la clave <code>service_role</code> de Supabase. En el dashboard de Supabase podés regenerar o cambiar credenciales si alguna se expone.</li>
+</ul>
+<p>---</p>
+<h2>Anexo: flujo de un negocio de punta a punta</h2>
+<ol>
+<li>Un <strong>puestero</strong> se registra en la web → su negocio se crea <strong>oculto</strong> (pendiente).</li>
+<li>Como <strong>admin</strong>, en <strong>Negocios</strong> tocá <strong>“Publicar”</strong> para mostrarlo.</li>
+<li>El puestero sube <strong>catálogos</strong> (quedan pendientes) y/o <strong>productos</strong> (según el modo de aprobación del negocio).</li>
+<li>Como admin, aprobás catálogos en <strong>Catálogos</strong> y productos en <strong>Productos</strong> (si aplica), y marcás liquidaciones si corresponde.</li>
+<li>Opcional: cargás <strong>fechas de ferias</strong> y ajustás la <strong>portada</strong>.</li>
+<li>Todo lo aprobado se refleja al instante en la página pública.</li>
+</ol>
+
+</body></html>

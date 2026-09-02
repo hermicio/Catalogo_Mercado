@@ -1,0 +1,47 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const error = Astro.url.searchParams.get('error') ?? 'Procesando confirmaci\u00f3n de tu correo...';
+---
+
+<Layout title="Confirmar correo">
+  <div class="mx-auto max-w-md px-4 py-16">
+    <div class="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm text-center">
+      <h1 class="text-2xl font-bold text-gray-900">Confirmando tu correo</h1>
+      <p id="estado" class="mt-4 text-sm text-gray-600">{error}</p>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  import { createClient } from '../lib/supabase-auth-client';
+
+  (async () => {
+    const estado = document.getElementById('estado');
+    if (!estado) return;
+    const hash = window.location.hash;
+
+    const params = new URLSearchParams(hash.startsWith('#') ? hash.slice(1) : hash);
+    const tokenHash = params.get('token_hash');
+    const type = params.get('type');
+    const next = params.get('next') ?? '/misnegocios';
+
+    if (!tokenHash || !type) {
+      estado.textContent =
+        'El enlace de confirmaci\u00f3n es inv\u00e1lido o ya expir\u00f3. Solicita un nuevo enlace o vuelve a registrarte.';
+      return;
+    }
+
+    const supabase = createClient();
+
+    const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type });
+
+    if (error) {
+      estado.textContent =
+        'No se pudo confirmar tu correo: ' + (error.message || 'enlace no v\u00e1lido o expirado.');
+      return;
+    }
+
+    window.location.href = next;
+  })();
+</script>

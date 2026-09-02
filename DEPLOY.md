@@ -59,10 +59,18 @@ git push -u origin main
 
 6. **Asegurarse de poder iniciar sesión**: el login con email y contraseña funciona igual que local. Confirma que en **Authentication → Providers → Email** el proveedor esté habilitado.
 
-7. **Crear el admin inicial** en producción. El script local `scripts/seed-admin.mjs` es solo para el entorno local. En producción hacelo así:
-   1. Creá la cuenta con el formulario normal de la app (va a quedar como `puestero`).
-   2. En **Authentication → Users** buscá tu usuario y editá los metadatos: en `app_metadata` poné `"role": "admin"` (guardá).
-   3. Refrescá; desde ese momento ese usuario tiene acceso a `/admin`.
+7. **Crear el admin inicial** en producción. Usá el script `scripts/seed-admin-prod.mjs` (usa variables de producción, no toca tu `.env` local). En PowerShell en la carpeta del proyecto:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+$env:SUPABASE_PROD_URL = "https://TU-PROYECTO.supabase.co"
+$env:SUPABASE_PROD_SERVICE_ROLE_KEY = "TU_NUEVA_SERVICE_ROLE"
+node scripts/seed-admin-prod.mjs "admin@tu-local.com" "TuClaveFuerte123!"
+```
+
+   Esto crea el usuario con `role = admin` (email confirmado). Si el email ya existe, le asigna el rol admin. A partir de ahí ese usuario entra a `/admin`.
+
+   > **Seguridad:** el script `seed-admin-prod.mjs` lee las claves de variables de entorno y **no las sube al repo**. Preferí una service_role nueva (regenerala en Supabase Dashboard → Project Settings → API keys si la anterior quedó expuesta).
 
 ---
 

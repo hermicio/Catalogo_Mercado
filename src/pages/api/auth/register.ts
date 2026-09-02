@@ -38,7 +38,12 @@ export const POST: APIRoute = async (context) => {
         name,
         slug,
       },
-      emailRedirectTo: context.site ? new URL('/login', context.site).toString() : '/login',
+      emailRedirectTo:
+        context.site
+          ? new URL('/confirm', context.site).toString()
+          : import.meta.env.SITE_URL
+            ? `${import.meta.env.SITE_URL}/confirm`
+            : 'http://localhost:4321/confirm',
     },
   });
 
