@@ -1,0 +1,117 @@
+---
+import Layout from '../layouts/Layout.astro';
+import BusinessCard from '../components/BusinessCard.astro';
+import type { Business, FairDate, Product, SiteSettings } from '../lib/types';
+
+const sb = Astro.locals.supabase;
+
+const today = new Date();
+const pad = (n: number) => String(n).padStart(2, '0');
+const todayISO = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
+
+const [bizResult, settingsResult, saleResult, fairResult] = await Promise.all([
+  sb.from('businesses').select('*').eq('is_visible', true).order('name'),
+  sb.from('site_settings').select('*').eq('id', 1).maybeSingle(),
+  sb.from('products').select('*, businesses!inner(name, slug)').eq('on_sale', true).eq('is_visible', true).order('sort_order', { ascending: true }).order('created_at', { ascending: false }),
+  sb.from('fair_dates').select('*').gte('fair_date', todayISO).order('fair_date'),
+]);
+
+const businesses = (bizResult.data ?? []) as Business[];
+const error = bizResult.error;
+const home = settingsResult.data as SiteSettings | null;
+const saleProducts = (saleResult.data ?? []) as unknown as (Product & { businesses: { name: string; slug: string } })[];
+const ferias = (fairResult.data ?? []) as FairDate[];
+const nearest = ferias[0] ?? null;
+
+const heroTitle = home?.home_title || 'Los catálogos de tu local, todos juntos';
+const heroSubtitle = home?.home_subtitle || 'Explora los negocios del local, selecciona uno y mira su catálogo en línea o descárgalo en PDF.';
+const heroImage = home?.hero_image_url;
+
+const fmt = (n: number) => '$' + Number(n).toLocaleString('es-AR', { minimumFractionDigits: 2 });
+---
+
+<Layout title="Inicio">
+  <section class="relative mx-auto max-w-6xl px-4 py-16">
+    {heroImage && (
+      <>
+        <div class="absolute inset-0 -z-0 rounded-3xl bg-cover bg-center shadow-inner" style={`background-image:url('${heroImage}')`}></div>
+        <div class="absolute inset-0 -z-0 rounded-3xl bg-white/75"></div>
+      </>
+    )}
+    <div class="relative z-10 text-center">
+      <h1 class="text-4xl font-bold text-gray-900 sm:text-5xl">{heroTitle}</h1>
+      <p class="mx-auto mt-4 max-w-2xl text-lg text-gray-600">{heroSubtitle}</p>
+    </div>
+
+    {nearest && (
+      <div class="relative z-10 mt-12 rounded-2xl border border-emerald-200 bg-white p-6 shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <h2 class="text-xl font-bold capitalize text-gray-900">Próximas fechas de ferias</h2>
+        </div>
+
+        <ul class="mt-4 space-y-2">
+          {ferias.map((f) => {
+            const fDate = new Date(f.fair_date + 'T12:00:00');
+            const isNearest = f.id === nearest.id;
+            return (
+              <li class={`flex items-center justify-between gap-3 rounded-xl border px-4 py-2.5 ${isNearest ? 'border-emerald-400 bg-emerald-50' : 'border-gray-200'}`}>
+                <div class="min-w-0">
+                  <p class={`font-medium ${isNearest ? 'text-emerald-900' : 'text-gray-900'}`}>
+                    {fDate.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                    {f.title ? ` · ${f.title}` : ''}
+                  </p>
+                  {f.description && <p class="truncate text-sm text-gray-500">{f.description}</p>}
+                </div>
+                {isNearest && (
+                  <span class="shrink-0 rounded-full bg-emerald-600 px-2.5 py-0.5 text-xs font-semibold text-white">Más próxima</span>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    )}
+
+    {saleProducts.length > 0 && (
+      <div class="relative z-10 mt-12">
+        <h2 class="text-xl font-bold text-gray-900">Liquidaciones del momento</h2>
+        <div class="mt-4 overflow-hidden rounded-2xl border border-red-200 bg-white py-4 shadow-sm">
+          <div class="marquee-track flex w-max items-stretch gap-4 px-4">
+            {[...saleProducts, ...saleProducts].map((p) => (
+              <a
+                href={`/negocio/${p.businesses.slug}`}
+                class="flex w-64 shrink-0 items-center gap-3 rounded-xl border-2 border-red-300 bg-white p-3 shadow-sm transition hover:-translate-y-0.5 hover:bg-red-50"
+              >
+                <div class="h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-gray-100">
+                  {p.image_url ? (
+                    <img src={p.image_url} alt={p.name} class="h-full w-full object-cover" loading="lazy" />
+                  ) : (
+                    <div class="grid h-full w-full place-items-center text-gray-400">🛍️</div>
+                  )}
+                </div>
+                <div class="min-w-0 flex-1">
+                  <p class="truncate font-medium text-gray-900">{p.name}</p>
+                  <p class="truncate text-xs text-gray-500">{p.businesses.name}</p>
+                  <p class="text-sm font-bold text-red-600">{fmt(p.price)}</p>
+                </div>
+                <span class="shrink-0 rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-semibold text-white">Liquidación</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+    )}
+
+    {error ? (
+      <p class="relative z-10 mt-12 text-center text-red-600">No se pudieron cargar los negocios. Intenta más tarde.</p>
+    ) : (
+      <div class="relative z-10 mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {businesses && businesses.length > 0 ? (
+          businesses.map((b) => <BusinessCard business={b as Business} />)
+        ) : (
+          <p class="col-span-full text-center text-gray-500">Aún no hay negocios publicados.</p>
+        )}
+      </div>
+    )}
+  </section>
+</Layout>

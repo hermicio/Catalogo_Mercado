@@ -1,0 +1,80 @@
+---
+import DashboardLayout from '../../../layouts/DashboardLayout.astro';
+import { getRole } from '../../../lib/types';
+import type { Business } from '../../../lib/types';
+
+interface Props {
+  slug: string;
+}
+
+const { slug } = Astro.params as unknown as Props;
+const sb = Astro.locals.supabase;
+const user = Astro.locals.user;
+const role = getRole(user);
+
+const { data: business } =
+  role !== 'admin'
+    ? await sb.from('businesses').select('*').eq('slug', slug).eq('owner_id', user!.id).single()
+    : await sb.from('businesses').select('*').eq('slug', slug).single();
+---
+
+<DashboardLayout title="Editar negocio" role={role} active="/misnegocios">
+  {!business ? (
+    <p class="text-gray-500">No encuentro ese negocio o no tienes permisos para editarlo.</p>
+  ) : (
+    <form method="POST" action="/api/businesses/update" enctype="multipart/form-data" class="space-y-5 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <input type="hidden" name="id" value={(business as Business).id} />
+
+      <div class="grid gap-5 sm:grid-cols-2">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Nombre del negocio</label>
+          <input name="name" required value={(business as Business).name} class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Dirección / local</label>
+          <input name="address" value={(business as Business).address ?? ''} class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Horario</label>
+          <input name="schedule" value={(business as Business).schedule ?? ''} class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Teléfono</label>
+          <input name="phone" value={(business as Business).phone ?? ''} class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" />
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Descripción corta (para la tarjeta)</label>
+        <textarea name="description_short" rows="2" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2">{(business as Business).description_short ?? ''}</textarea>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Descripción completa</label>
+        <textarea name="description" rows="4" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2">{(business as Business).description ?? ''}</textarea>
+      </div>
+
+      <div class="grid gap-5 sm:grid-cols-2">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Imagen representativa (dejar vacío para mantener)</label>
+          <input type="file" name="image" accept="image/*" class="mt-1 w-full text-sm" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Imagen de portada (dejar vacío para mantener)</label>
+          <input type="file" name="cover" accept="image/*" class="mt-1 w-full text-sm" />
+        </div>
+      </div>
+
+      {(business as Business).image_url && (
+        <div>
+          <p class="mb-1 text-sm text-gray-500">Imagen actual:</p>
+          <img src={(business as Business).image_url} class="h-24 w-24 rounded-lg object-cover" />
+        </div>
+      )}
+
+      <button type="submit" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700">
+        Guardar cambios
+      </button>
+    </form>
+  )}
+</DashboardLayout>

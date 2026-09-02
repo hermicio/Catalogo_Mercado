@@ -1,0 +1,50 @@
+---
+import Layout from '../../../../layouts/Layout.astro';
+import type { Business, Catalog } from '../../../../lib/types';
+
+interface Props {
+  slug: string;
+  id: string;
+}
+
+const { slug, id } = Astro.params as unknown as Props;
+const sb = Astro.locals.supabase;
+
+const { data: catalog, error } = await sb
+  .from('catalogs')
+  .select('*, businesses!inner(slug, name)')
+  .eq('id', id)
+  .eq('is_visible', true)
+  .single();
+
+const cat = catalog as unknown as Catalog & { businesses: Business };
+
+if (error || !cat || cat.businesses.slug !== slug) {
+  return Astro.redirect(`/negocio/${slug}`);
+}
+---
+
+<Layout title={cat.title}>
+  <div class="mx-auto max-w-6xl px-4 py-8">
+    <nav class="mb-6 flex items-center justify-between text-sm text-gray-500">
+      <div>
+        <a href="/" class="hover:text-emerald-600">Inicio</a>
+        <span class="mx-2">/</span>
+        <a href={`/negocio/${slug}`} class="hover:text-emerald-600">{cat.businesses.name}</a>
+        <span class="mx-2">/</span>
+        <span class="text-gray-900">{cat.title}</span>
+      </div>
+      <a
+        href={cat.pdf_url}
+        download
+        class="rounded-lg bg-emerald-600 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+      >
+        Descargar PDF
+      </a>
+    </nav>
+
+    <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+      <iframe src={cat.pdf_url} title={cat.title} class="h-[85vh] w-full"></iframe>
+    </div>
+  </div>
+</Layout>

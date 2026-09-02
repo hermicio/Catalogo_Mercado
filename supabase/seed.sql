@@ -1,0 +1,3 @@
+-- Seed local opcional.
+-- Los negocios se crean automáticamente al registrarse un puestero,
+-- así que no hace falta llenar datos aquí.

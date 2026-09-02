@@ -1,0 +1,35 @@
+---
+import type { Business } from '../lib/types';
+
+interface Props {
+  business: Business;
+}
+
+const { business } = Astro.props as Props;
+---
+
+<a
+  href={`/negocio/${business.slug}`}
+  class="group block overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+>
+  <div class="aspect-[4/3] w-full overflow-hidden bg-gray-100">
+    <img
+      src={business.image_url}
+      alt={business.name}
+      class="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+      loading="lazy"
+    />
+  </div>
+  <div class="p-4">
+    <h3 class="text-lg font-semibold text-gray-900">{business.name}</h3>
+    {business.description_short && (
+      <p class="mt-1 line-clamp-2 text-sm text-gray-500">{business.description_short}</p>
+    )}
+    <span class="mt-3 inline-flex items-center gap-1 text-sm font-medium text-emerald-600">
+      Ver catálogos
+      <svg class="h-4 w-4 transition group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+      </svg>
+    </span>
+  </div>
+</a>

@@ -1,0 +1,78 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import { adminClient } from '../../lib/supabase';
+import type { Business, Role } from '../../lib/types';
+
+const sb = Astro.locals.supabase;
+const admin = adminClient();
+
+const [usersResult, businessesResult] = await Promise.all([
+  admin.auth.admin.listUsers({ perPage: 1000 }),
+  sb.from('businesses').select('*'),
+]);
+
+const users = usersResult.error ? [] : usersResult.data.users;
+const businesses = (businessesResult.data ?? []) as Business[];
+const error = Astro.url.searchParams.get('error');
+
+const owns = (userId: string) =>
+  businesses.filter((b) => b.owner_id === userId);
+---
+
+<DashboardLayout title="Gestionar usuarios" role="admin" active="/admin/usuarios">
+  {error && <div class="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
+
+  <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Usuario</th>
+          <th class="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Rol</th>
+          <th class="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Negocios</th>
+          <th class="px-4 py-3 text-right text-xs font-medium uppercase text-gray-500">Acciones</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        {users.map((u) => {
+          const role = (u.app_metadata?.role as Role) ?? (u.user_metadata?.role as Role) ?? 'puestero';
+          const myBiz = owns(u.id);
+          return (
+            <tr>
+              <td class="px-4 py-3 text-sm">
+                <p class="font-medium text-gray-900">{u.email}</p>
+                <p class="text-xs text-gray-400">{u.email_confirmed_at ? 'Verificado' : 'Sin confirmar'}</p>
+              </td>
+              <td class="px-4 py-3">
+                <span class={`rounded-full px-2 py-0.5 text-xs font-medium ${role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600'}`}>
+                  {role === 'admin' ? 'Administrador' : 'Puestero'}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-sm text-gray-600">
+                {myBiz.length ? myBiz.map((b) => b.name).join(', ') : <span class="text-gray-400">Ninguno</span>}
+              </td>
+              <td class="px-4 py-3 text-right">
+                {role !== 'admin' && (
+                  <form method="POST" action="/api/admin/users/assign" class="flex items-center justify-end gap-2">
+                    <input type="hidden" name="user_id" value={u.id} />
+                    <select name="business_id" class="rounded-lg border border-gray-300 px-2 py-1.5 text-sm">
+                      <option value="">Sin negocio</option>
+                      {businesses
+                        .filter((b) => !b.owner_id || b.owner_id === u.id)
+                        .map((b) => (
+                          <option value={b.id} selected={b.owner_id === u.id}>{b.name}</option>
+                        ))}
+                    </select>
+                    <button type="submit" class="rounded-lg border border-emerald-200 px-3 py-1.5 text-sm text-emerald-700 hover:bg-emerald-50">
+                      Asignar
+                    </button>
+                  </form>
+                )}
+              </td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+    {users.length === 0 && <p class="p-8 text-center text-gray-500">No hay usuarios.</p>}
+  </div>
+</DashboardLayout>

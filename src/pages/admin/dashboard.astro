@@ -1,0 +1,50 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import { adminClient } from '../../lib/supabase';
+
+const sb = Astro.locals.supabase;
+const admin = adminClient();
+
+const [biz, users, pendingCatalogs, visibleBiz] = await Promise.all([
+  sb.from('businesses').select('id'),
+  admin.auth.admin.listUsers({ perPage: 1000 }),
+  sb.from('catalogs').select('id').eq('is_visible', false),
+  sb.from('businesses').select('id').eq('is_visible', true),
+]);
+---
+
+<DashboardLayout title="Panel de administración" role="admin" active="/admin/dashboard">
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+      <p class="text-sm text-gray-500">Negocios totales</p>
+      <p class="mt-1 text-3xl font-bold text-gray-900">{biz.error ? 0 : biz.data?.length ?? 0}</p>
+    </div>
+    <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+      <p class="text-sm text-gray-500">Negocios publicados</p>
+      <p class="mt-1 text-3xl font-bold text-emerald-600">{visibleBiz.error ? 0 : visibleBiz.data?.length ?? 0}</p>
+    </div>
+    <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+      <p class="text-sm text-gray-500">Usuarios (puesteros)</p>
+      <p class="mt-1 text-3xl font-bold text-gray-900">{users.error ? 0 : users.data.users.filter(u => (u.user_metadata?.role as string) === 'puestero').length}</p>
+    </div>
+    <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+      <p class="text-sm text-gray-500">Catálogos pendientes</p>
+      <p class="mt-1 text-3xl font-bold text-amber-600">{pendingCatalogs.error ? 0 : pendingCatalogs.data?.length ?? 0}</p>
+    </div>
+  </div>
+
+  <div class="mt-8 grid gap-4 sm:grid-cols-2">
+    <a href="/admin/negocios" class="block rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition hover:border-emerald-300 hover:shadow">
+      <p class="text-lg font-semibold text-gray-900">📋 Gestionar negocios</p>
+      <p class="mt-1 text-sm text-gray-500">Crear, editar, aprobar o desactivar negocios.</p>
+    </a>
+    <a href="/admin/catalogos" class="block rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition hover:border-emerald-300 hover:shadow">
+      <p class="text-lg font-semibold text-gray-900">📄 Aprobar catálogos</p>
+      <p class="mt-1 text-sm text-gray-500">Revisar y publicar catálogos subidos por puesteros.</p>
+    </a>
+    <a href="/admin/usuarios" class="block rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition hover:border-emerald-300 hover:shadow">
+      <p class="text-lg font-semibold text-gray-900">👥 Gestionar usuarios</p>
+      <p class="mt-1 text-sm text-gray-500">Ver puesteros registrados y sus roles.</p>
+    </a>
+  </div>
+</DashboardLayout>

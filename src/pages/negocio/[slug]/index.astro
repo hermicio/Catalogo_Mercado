@@ -1,0 +1,163 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import type { Business, Catalog, Product } from '../../../lib/types';
+
+interface Props {
+  slug: string;
+}
+
+const { slug } = Astro.params as unknown as Props;
+const sb = Astro.locals.supabase;
+
+const { data: business, error } = await sb
+  .from('businesses')
+  .select('*')
+  .eq('slug', slug)
+  .eq('is_visible', true)
+  .single();
+
+if (error || !business) {
+  return Astro.redirect('/');
+}
+
+const b = business as Business;
+
+const { data: catalogs } = await sb
+  .from('catalogs')
+  .select('*')
+  .eq('business_id', b.id)
+  .eq('is_visible', true)
+  .order('sort_order', { ascending: true });
+
+const { data: products } = await sb
+  .from('products')
+  .select('*')
+  .eq('business_id', b.id)
+  .eq('is_visible', true)
+  .order('sort_order', { ascending: true })
+  .order('created_at', { ascending: false });
+
+const fmt = (n: number) => '$' + Number(n).toLocaleString('es-AR', { minimumFractionDigits: 2 });
+---
+
+<Layout title={b.name}>
+  <div class="mx-auto max-w-6xl px-4 py-10">
+    <nav class="mb-6 text-sm text-gray-500">
+      <a href="/" class="hover:text-emerald-600">Inicio</a>
+      <span class="mx-2">/</span>
+      <span class="text-gray-900">{b.name}</span>
+    </nav>
+
+    <div class="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm">
+      {b.cover_url ? (
+        <div class="aspect-[21/9] w-full overflow-hidden bg-gray-100">
+          <img src={b.cover_url} alt={b.name} class="h-full w-full object-cover" />
+        </div>
+      ) : (
+        <div class="aspect-[21/9] w-full overflow-hidden bg-gradient-to-r from-emerald-500 to-teal-500"></div>
+      )}
+
+      <div class="p-6 sm:p-8">
+        <h1 class="text-3xl font-bold text-gray-900">{b.name}</h1>
+        {b.description && <p class="mt-3 text-gray-600">{b.description}</p>}
+
+        <dl class="mt-6 grid gap-4 text-sm sm:grid-cols-2">
+          {b.address && (
+            <div>
+              <dt class="font-semibold text-gray-900">Ubicación</dt>
+              <dd class="mt-1 text-gray-600">{b.address}</dd>
+            </div>
+          )}
+          {b.schedule && (
+            <div>
+              <dt class="font-semibold text-gray-900">Horario</dt>
+              <dd class="mt-1 text-gray-600">{b.schedule}</dd>
+            </div>
+          )}
+          {b.phone && (
+            <div>
+              <dt class="font-semibold text-gray-900">Teléfono</dt>
+              <dd class="mt-1 text-gray-600">{b.phone}</dd>
+            </div>
+          )}
+        </dl>
+      </div>
+    </div>
+
+    <section class="mt-10">
+      <h2 class="text-2xl font-bold text-gray-900">Catálogos</h2>
+      {catalogs && catalogs.length > 0 ? (
+        <div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {(catalogs as Catalog[]).map((c) => (
+            <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+              <div class="aspect-[3/4] w-full overflow-hidden bg-gray-100">
+                {c.thumbnail_url ? (
+                  <img src={c.thumbnail_url} alt={c.title} class="h-full w-full object-cover" loading="lazy" />
+                ) : (
+                  <div class="grid h-full w-full place-items-center bg-gray-100 text-gray-400">
+                    <svg class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                )}
+              </div>
+              <div class="p-4">
+                <h3 class="font-semibold text-gray-900">{c.title}</h3>
+                <div class="mt-3 flex gap-2">
+                  <a
+                    href={`/negocio/${b.slug}/catalogo/${c.id}`}
+                    class="flex-1 rounded-lg bg-emerald-600 px-3 py-2 text-center text-sm font-medium text-white hover:bg-emerald-700"
+                  >
+                    Ver en línea
+                  </a>
+                  <a
+                    href={c.pdf_url}
+                    target="_blank"
+                    rel="noopener"
+                    download
+                    class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-center text-sm font-medium text-gray-700 hover:bg-gray-100"
+                  >
+                    Descargar PDF
+                  </a>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p class="mt-6 text-gray-500">Este negocio aún no tiene catálogos disponibles.</p>
+      )}
+    </section>
+
+    <section class="mt-10">
+      <h2 class="text-2xl font-bold text-gray-900">Productos a la venta</h2>
+      {products && products.length > 0 ? (
+        <div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {(products as Product[]).map((p) => (
+            <div class={`overflow-hidden rounded-2xl bg-white shadow-sm ${p.on_sale ? 'border-2 border-red-400 ring-2 ring-red-100' : 'border border-gray-200'}`}>
+              <div class="aspect-square w-full overflow-hidden bg-gray-100">
+                {p.image_url ? (
+                  <img src={p.image_url} alt={p.name} class="h-full w-full object-cover" loading="lazy" />
+                ) : (
+                  <div class="grid h-full w-full place-items-center bg-gray-100 text-gray-400">🛍️</div>
+                )}
+              </div>
+              <div class="p-4">
+                <div class="flex flex-wrap items-center gap-2">
+                  <h3 class="font-semibold text-gray-900">{p.name}</h3>
+                  {p.on_sale && (
+                    <span class="rounded-full bg-red-600 px-2 py-0.5 text-xs font-semibold text-white">¡En liquidación!</span>
+                  )}
+                </div>
+                <p class={`mt-1 text-lg font-bold ${p.on_sale ? 'text-red-600' : 'text-emerald-700'}`}>{fmt(p.price)}</p>
+                {p.description && <p class="mt-2 text-sm text-gray-600">{p.description}</p>}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p class="mt-6 text-gray-500">Este negocio aún no tiene productos en venta.</p>
+      )}
+    </section>
+  </div>
+</Layout>

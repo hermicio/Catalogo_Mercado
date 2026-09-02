@@ -1,0 +1,109 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import type { Business } from '../../lib/types';
+
+const sb = Astro.locals.supabase;
+
+const [bizResult, usersResult] = await Promise.all([
+  sb.from('businesses').select('*').order('name'),
+  sb.auth.admin.listUsers({ perPage: 1000 }),
+]);
+
+const businesses = (bizResult.data ?? []) as Business[];
+const users = usersResult.error ? [] : usersResult.data.users;
+const error = Astro.url.searchParams.get('error');
+---
+
+<DashboardLayout title="Gestionar negocios" role="admin" active="/admin/negocios">
+  {error && <div class="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
+
+  <form method="POST" action="/api/admin/businesses/create" class="mb-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+    <h2 class="mb-4 font-semibold text-gray-900">Crear nuevo negocio</h2>
+    <div class="grid gap-4 sm:grid-cols-2">
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Nombre</label>
+        <input name="name" required class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" />
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Dirección / local</label>
+        <input name="address" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" />
+      </div>
+    </div>
+    <div class="mt-4">
+      <label class="block text-sm font-medium text-gray-700">Descripción</label>
+      <textarea name="description_short" rows="2" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2"></textarea>
+    </div>
+    <button type="submit" class="mt-4 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700">
+      Crear negocio
+    </button>
+  </form>
+
+  <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Negocio</th>
+          <th class="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Dueño</th>
+          <th class="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Estado</th>
+          <th class="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Aprobación de productos</th>
+          <th class="px-4 py-3 text-right text-xs font-medium uppercase text-gray-500">Acciones</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        {businesses.map((b) => {
+          const owner = users.find((u) => u.id === b.owner_id);
+          return (
+            <tr>
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-3">
+                  <div class="h-10 w-10 overflow-hidden rounded-lg bg-gray-100">
+                    {b.image_url ? <img src={b.image_url} class="h-full w-full object-cover" /> : <div class="grid h-full w-full place-items-center text-xs">📷</div>}
+                  </div>
+                  <div>
+                    <p class="font-medium text-gray-900">{b.name}</p>
+                    <a href={`/negocio/${b.slug}`} class="text-xs text-emerald-600 hover:underline">Ver sitio</a>
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-3 text-sm text-gray-600">
+                {owner ? owner.email : <span class="text-gray-400">Sin asignar</span>}
+              </td>
+              <td class="px-4 py-3">
+                <span class={`rounded-full px-2 py-0.5 text-xs font-medium ${b.is_visible ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-600'}`}>
+                  {b.is_visible ? 'Publicado' : 'Oculto'}
+                </span>
+              </td>
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-2">
+                  <span class={`rounded-full px-2 py-0.5 text-xs font-medium ${b.products_auto_visible ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                    {b.products_auto_visible ? 'Automática' : 'Requiere admin'}
+                  </span>
+                  <form method="POST" action="/api/admin/businesses/toggle_products_auto">
+                    <input type="hidden" name="id" value={b.id} />
+                    <button type="submit" class="rounded-lg border border-gray-300 px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-100" title="Cambiar política de aprobación de productos">
+                      Cambiar
+                    </button>
+                  </form>
+                </div>
+              </td>
+              <td class="px-4 py-3 text-right">
+                <div class="flex justify-end gap-2">
+                  <form method="POST" action="/api/admin/businesses/toggle">
+                    <input type="hidden" name="id" value={b.id} />
+                    <button type="submit" class="rounded-lg border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100">
+                      {b.is_visible ? 'Ocultar' : 'Publicar'}
+                    </button>
+                  </form>
+                  <a href={`/misnegocios/editar/${b.slug}`} class="rounded-lg border border-emerald-200 px-3 py-1.5 text-sm text-emerald-700 hover:bg-emerald-50">
+                    Editar
+                  </a>
+                </div>
+              </td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+    {businesses.length === 0 && <p class="p-8 text-center text-gray-500">No hay negocios todavía.</p>}
+  </div>
+</DashboardLayout>

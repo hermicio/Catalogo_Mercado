@@ -1,0 +1,118 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import type { Product } from '../../lib/types';
+
+const sb = Astro.locals.supabase;
+
+const { data: rows } = await sb
+  .from('products')
+  .select('*, businesses(name)')
+  .order('created_at', { ascending: false });
+const error = Astro.url.searchParams.get('error');
+
+const products = (rows ?? []) as unknown as (Product & { businesses: { name: string } })[];
+const pending = products.filter((p) => !p.is_visible);
+const published = products.filter((p) => p.is_visible);
+
+const fmt = (n: number) => '$' + Number(n).toLocaleString('es-AR', { minimumFractionDigits: 2 });
+---
+
+<DashboardLayout title="Aprobar productos" role="admin" active="/admin/productos">
+  {error && <div class="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
+
+  <section class="mb-8">
+    <h2 class="mb-4 font-semibold text-gray-900">Pendientes de aprobación ({pending.length})</h2>
+    {pending.length > 0 ? (
+      <div class="space-y-3">
+        {pending.map((p) => (
+          <div class="flex flex-wrap items-center gap-4 rounded-xl border border-amber-200 bg-amber-50 p-4">
+            <div class="h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-gray-100">
+              {p.image_url ? (
+                <img src={p.image_url} alt={p.name} class="h-full w-full object-cover" />
+              ) : (
+                <div class="grid h-full w-full place-items-center text-gray-400">🛍️</div>
+              )}
+            </div>
+            <div class="min-w-0 flex-1">
+              <p class="font-medium text-gray-900">{p.name}</p>
+              {p.on_sale && (
+                <span class="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700">En liquidación</span>
+              )}
+              <p class="text-sm text-gray-600">Negocio: {p.businesses?.name}</p>
+              <p class="text-sm font-semibold text-emerald-700">{fmt(p.price)}</p>
+            </div>
+            <div class="flex gap-2">
+              <form method="POST" action="/api/admin/products/setvisible">
+                <input type="hidden" name="id" value={p.id} />
+                <input type="hidden" name="visible" value="true" />
+                <button type="submit" class="rounded-lg bg-emerald-600 px-3 py-1.5 text-sm text-white hover:bg-emerald-700">Aprobar</button>
+              </form>
+              <form method="POST" action="/api/admin/products/setvisible">
+                <input type="hidden" name="id" value={p.id} />
+                <input type="hidden" name="visible" value="false" />
+                <button type="submit" class="rounded-lg border border-red-200 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50">Rechazar</button>
+              </form>
+            </div>
+          </div>
+        ))}
+      </div>
+    ) : (
+      <p class="text-gray-500">No hay productos pendientes.</p>
+    )}
+  </section>
+
+  <section>
+    <h2 class="mb-4 font-semibold text-gray-900">Publicados ({published.length})</h2>
+    {published.length > 0 ? (
+      <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Producto</th>
+              <th class="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Negocio</th>
+              <th class="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Precio</th>
+              <th class="px-4 py-3 text-right text-xs font-medium uppercase text-gray-500">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            {published.map((p) => (
+              <tr>
+                <td class="px-4 py-3 text-sm font-medium text-gray-900">
+                  <div class="flex flex-wrap items-center gap-2">
+                    {p.name}
+                    {p.on_sale && (
+                      <span class="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700">En liquidación</span>
+                    )}
+                  </div>
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-600">{p.businesses?.name}</td>
+                <td class="px-4 py-3 text-sm text-gray-900">{fmt(p.price)}</td>
+                <td class="px-4 py-3 text-right">
+                  <div class="flex justify-end gap-2">
+                    <form method="POST" action="/api/admin/products/toggle_sale">
+                      <input type="hidden" name="id" value={p.id} />
+                      <button type="submit" class={`rounded-lg border px-3 py-1.5 text-sm ${p.on_sale ? 'border-red-300 bg-red-50 text-red-700 hover:bg-red-100' : 'border-gray-300 text-gray-700 hover:bg-gray-100'}`}>
+                        {p.on_sale ? 'Quitar liquidación' : 'Marcar en liquidación'}
+                      </button>
+                    </form>
+                    <form method="POST" action="/api/admin/products/setvisible">
+                      <input type="hidden" name="id" value={p.id} />
+                      <input type="hidden" name="visible" value="false" />
+                      <button type="submit" class="rounded-lg border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100">Ocultar</button>
+                    </form>
+                    <form method="POST" action="/api/products/delete">
+                      <input type="hidden" name="id" value={p.id} />
+                      <button type="submit" class="rounded-lg border border-red-200 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50">Eliminar</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    ) : (
+      <p class="text-gray-500">Aún no hay productos publicados.</p>
+    )}
+  </section>
+</DashboardLayout>

@@ -1,0 +1,176 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import { getRole } from '../../lib/types';
+import type { Business, Product } from '../../lib/types';
+
+const sb = Astro.locals.supabase;
+const user = Astro.locals.user;
+const role = getRole(user);
+
+const { data: myBusinesses } = await sb
+  .from('businesses')
+  .select('*')
+  .eq('owner_id', user!.id);
+
+const businesses = (myBusinesses ?? []) as Business[];
+const ids = businesses.map((b) => b.id);
+
+const { data: productRows } = ids.length
+  ? await sb.from('products').select('*, businesses(name)').in('business_id', ids).order('sort_order', { ascending: true }).order('created_at', { ascending: false })
+  : { data: [] };
+
+const products = (productRows ?? []) as unknown as (Product & { businesses: { name: string } })[];
+const error = Astro.url.searchParams.get('error');
+
+const fmt = (n: number) => '$' + Number(n).toLocaleString('es-AR', { minimumFractionDigits: 2 });
+---
+
+<DashboardLayout title="Mis productos" role={role} active="/misnegocios/productos">
+  {error && <div class="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
+
+  <div class="mb-4 text-right">
+    <a href="/misnegocios/carga-masiva" class="inline-flex items-center gap-2 rounded-lg border border-emerald-200 px-4 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-50">
+      📋 Carga masiva de productos
+    </a>
+  </div>
+
+  {businesses.length > 0 ? (
+    <form method="POST" action="/api/products/create" enctype="multipart/form-data" class="mb-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <h2 class="mb-4 font-semibold text-gray-900">Publicar un producto nuevo</h2>
+      <div class="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Negocio</label>
+          <select id="producto-negocio" name="business_id" required class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2">
+            {businesses.map((b) => (
+              <option value={b.id} data-auto={String(Boolean(b.products_auto_visible))}>{b.name}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Nombre del producto</label>
+          <input name="name" required class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Precio (en pesos)</label>
+          <input type="number" name="price" min="0" step="0.01" required class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Imagen del producto</label>
+          <input type="file" name="image" accept="image/*" class="mt-1 w-full text-sm" />
+        </div>
+        <div class="sm:col-span-2">
+          <label class="block text-sm font-medium text-gray-700">Descripción</label>
+          <textarea name="description" rows="3" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2"></textarea>
+        </div>
+      </div>
+      <div class="mt-4 text-sm text-gray-500" id="producto-nota">
+        Nota: los productos publicados por puesteros quedan <strong>pendientes de aprobación</strong> por el administrador.
+      </div>
+      <script>
+        const select = document.getElementById('producto-negocio') as HTMLSelectElement | null;
+        const nota = document.getElementById('producto-nota');
+        const actualizar = () => {
+          if (!select || !nota) return;
+          const opt = select.selectedOptions[0];
+          if (opt?.dataset.auto === 'true') {
+            nota.innerHTML = 'Este negocio tiene <strong>publicación automática</strong>: tu producto se verá al instante, sin aprobación del administrador.';
+          } else {
+            nota.innerHTML = 'Nota: los productos publicados por puesteros quedan <strong>pendientes de aprobación</strong> por el administrador.';
+          }
+        };
+        select?.addEventListener('change', actualizar);
+        actualizar();
+      </script>
+      <button type="submit" class="mt-4 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700">
+        Publicar producto
+      </button>
+    </form>
+  ) : (
+    <p class="mb-6 text-gray-500">Primero debes tener un negocio asociado para publicar productos.</p>
+  )}
+
+  {products.length > 0 ? (
+    <div class="space-y-3">
+      {products.map((p) => (
+        <div class={`rounded-xl border p-4 shadow-sm bg-white ${p.on_sale ? 'border-red-300 ring-2 ring-red-100' : 'border-gray-200'}`}>
+          <div class="flex items-center gap-4">
+            <div class="h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-gray-100">
+              {p.image_url ? (
+                <img src={p.image_url} alt={p.name} class="h-full w-full object-cover" />
+              ) : (
+                <div class="grid h-full w-full place-items-center text-gray-400">🛍️</div>
+              )}
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <p class="font-medium text-gray-900">{p.name}</p>
+                {p.on_sale && (
+                  <span class="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700">En liquidación</span>
+                )}
+                {!p.is_visible && (
+                  <span class="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">Pendiente de aprobación</span>
+                )}
+              </div>
+              <p class="text-sm text-gray-500">{p.businesses?.name}</p>
+              <p class={`text-sm font-semibold ${p.on_sale ? 'text-red-600' : 'text-emerald-700'}`}>{fmt(p.price)}</p>
+            </div>
+            <div class="flex flex-col items-center gap-1">
+              <form method="POST" action="/api/products/reorder">
+                <input type="hidden" name="id" value={p.id} />
+                <input type="hidden" name="dir" value="up" />
+                <button type="submit" title="Subir en el orden" class="rounded-lg border border-gray-300 px-2 py-1 text-sm text-gray-600 hover:bg-gray-100">↑</button>
+              </form>
+              <form method="POST" action="/api/products/reorder">
+                <input type="hidden" name="id" value={p.id} />
+                <input type="hidden" name="dir" value="down" />
+                <button type="submit" title="Bajar en el orden" class="rounded-lg border border-gray-300 px-2 py-1 text-sm text-gray-600 hover:bg-gray-100">↓</button>
+              </form>
+            </div>
+            <div class="flex flex-col gap-2">
+              <details class="relative">
+                <summary class="cursor-pointer rounded-lg border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100">Editar</summary>
+                <div class="absolute right-0 z-10 mt-2 w-80 rounded-xl border border-gray-200 bg-white p-4 shadow-lg">
+                  <form method="POST" action="/api/products/update" enctype="multipart/form-data" class="space-y-3">
+                    <input type="hidden" name="id" value={p.id} />
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700">Nombre</label>
+                      <input name="name" required value={p.name} class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" />
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700">Precio</label>
+                      <input type="number" name="price" min="0" step="0.01" required value={String(p.price)} class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" />
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700">Descripción</label>
+                      <textarea name="description" rows="3" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2">{p.description ?? ''}</textarea>
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700">Nueva imagen (vacío conserva la actual)</label>
+                      <input type="file" name="image" accept="image/*" class="mt-1 w-full text-sm" />
+                    </div>
+                    <label class="flex items-center gap-2 text-sm text-gray-700">
+                      <input type="hidden" name="on_sale" value="off" />
+                      <input type="checkbox" name="on_sale" value="on" checked={Boolean(p.on_sale)} class="h-4 w-4 rounded border-gray-300" />
+                      Marcar en liquidación
+                    </label>
+                    <button type="submit" class="w-full rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700">
+                      Guardar cambios
+                    </button>
+                  </form>
+                </div>
+              </details>
+              <form method="POST" action="/api/products/delete" onsubmit="return confirm('¿Eliminar este producto?')">
+                <input type="hidden" name="id" value={p.id} />
+                <button type="submit" class="rounded-lg border border-red-200 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50">
+                  Eliminar
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  ) : (
+    <p class="text-gray-500">No tienes productos todavía.</p>
+  )}
+</DashboardLayout>

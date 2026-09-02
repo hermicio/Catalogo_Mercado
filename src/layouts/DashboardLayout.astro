@@ -1,0 +1,82 @@
+---
+import '../styles/global.css';
+import type { Role } from '../lib/types';
+
+interface Props {
+  title: string;
+  role: Role;
+  active?: string;
+}
+
+const { title, role, active } = Astro.props as Props;
+
+const items =
+  role === 'admin'
+    ? [
+        { href: '/admin/dashboard', label: 'Resumen' },
+        { href: '/admin/negocios', label: 'Negocios' },
+        { href: '/admin/usuarios', label: 'Usuarios' },
+        { href: '/admin/catalogos', label: 'Catálogos' },
+        { href: '/admin/productos', label: 'Productos' },
+        { href: '/admin/portada', label: 'Página principal' },
+        { href: '/admin/ferias', label: 'Ferias' },
+      ]
+    : [
+        { href: '/misnegocios', label: 'Mi negocio' },
+        { href: '/misnegocios/catalogos', label: 'Mis catálogos' },
+        { href: '/misnegocios/productos', label: 'Mis productos' },
+        { href: '/misnegocios/perfil', label: 'Perfil' },
+      ];
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title} · Catálogos del Local</title>
+  </head>
+  <body class="min-h-screen bg-gray-100">
+    <header class="border-b border-gray-200 bg-white">
+      <div class="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
+        <div class="flex items-center gap-4">
+          <a href="/" class="text-lg font-bold text-gray-900">📦 Catálogos del Local</a>
+          <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">
+            {role === 'admin' ? 'Administrador' : 'Puestero'}
+          </span>
+        </div>
+        <form method="POST" action="/api/auth/signout">
+          <button type="submit" class="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100">
+            Cerrar sesión
+          </button>
+        </form>
+      </div>
+    </header>
+
+    <div class="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-8 md:flex-row">
+      <aside class="shrink-0 md:w-56">
+        <nav class="flex gap-2 overflow-x-auto md:flex-col">
+          {items.map((item) => (
+            <a
+              href={item.href}
+              class={`whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium ${
+                active === item.href
+                  ? 'bg-emerald-600 text-white'
+                  : 'text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              {item.label}
+            </a>
+          ))}
+          <a href="/" class="whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-200">
+            Ver sitio público
+          </a>
+        </nav>
+      </aside>
+      <main class="min-w-0 flex-1">
+        <h1 class="mb-6 text-2xl font-bold text-gray-900">{title}</h1>
+        <slot />
+      </main>
+    </div>
+  </body>
+</html>
