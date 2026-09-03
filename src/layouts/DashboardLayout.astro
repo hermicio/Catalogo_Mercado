@@ -10,6 +10,8 @@ interface Props {
 
 const { title, role, active } = Astro.props as Props;
 
+const manualHref = role === 'admin' ? '/manual/admin.html' : '/manual/usuario.html';
+
 const items =
   role === 'admin'
     ? [
@@ -70,6 +72,9 @@ const items =
           ))}
           <a href="/" class="whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-200">
             Ver sitio público
+          </a>
+          <a href={manualHref} target="_blank" class="whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-200">
+            Manual de uso
           </a>
         </nav>
       </aside>

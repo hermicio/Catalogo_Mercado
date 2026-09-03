@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><title>Manual de Administrador</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; color: #1f2937; margin: 40px; font-size: 13px; line-height: 1.55; }
+  h1 { color: #059669; font-size: 26px; border-bottom: 3px solid #059669; padding-bottom: 10px; }
+  h2 { color: #047857; font-size: 18px; border-bottom: 1px solid #d1d5db; padding-bottom: 5px; margin-top: 28px; }
+  h3 { color: #065f46; font-size: 15px; margin-top: 20px; }
+  strong { color: #111827; }
+  code { background: #f3f4f6; padding: 1px 5px; border-radius: 4px; font-family: Consolas, monospace; font-size: 12px; color: #be123c; }
+  blockquote { border-left: 4px solid #059669; background: #ecfdf5; margin: 12px 0; padding: 8px 14px; color: #065f46; border-radius: 0 6px 6px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0; }
+  th, td { border: 1px solid #d1d5db; padding: 7px 10px; text-align: left; vertical-align: top; }
+  th { background: #ecfdf5; color: #065f46; }
+  ol { padding-left: 20px; }
+  li { margin: 3px 0; }
+  a { color: #059669; }
+  hr { border: none; border-top: 1px solid #d1d5db; margin: 18px 0; }
+  .page-break { page-break-before: always; }
+
+</style></head><body>
+<h1>Manual de Usuario (Puestero) — Feria de Emprendedores</h1>
+
+<p>Guía de uso de la web "Feria de Emprendedores" para los emprendedores/puesteros que quieren publicar su negocio, catálogos y productos.</p>
+
+<hr />
+
+<h2>1. Crear tu cuenta</h2>
+
+<ol>
+<li>Entrá a la web (ej. <code>https://catalogo-mercado-eqbl.vercel.app</code>).</li>
+<li>Tocá <strong>"Registrarse"</strong> (arriba a la derecha).</li>
+<li>Completá:</li>
+<li><strong>Nombre del negocio</strong> (obligatorio).</li>
+<li><strong>Correo electrónico</strong>.</li>
+<li><strong>Contraseña</strong> (mínimo 6 caracteres).</li>
+<li>Tocá <strong>"Crear cuenta"</strong>.</li>
+</ol>
+
+<h3>Confirmar tu correo</h3>
+<p>Te llega un correo de Supabase para <strong>confirmar tu dirección de email</strong>. Hacé clic en el enlace del correo. Tu cuenta queda creada y tu correo verificado.</p>
+
+<blockquote>Si no ves el correo, revisá la carpeta de <strong>spam/correo no deseado</strong>.</blockquote>
+
+<hr />
+
+<h2>2. Esperar la aprobación del administrador</h2>
+
+<p>Cuando confirmás tu correo, tu cuenta queda <strong>en estado de espera</strong>. El administrador debe</p>
+<p><strong>aprobar tu alta</strong> antes de que puedas iniciar sesión.</p>
+
+<ol>
+<li>Mientras tanto, si intentás entrar, vas a ver la página <strong>"Cuenta pendiente de aprobación"</strong>.</li>
+<li>En cuanto el administrador te apruebe, podés iniciar sesión con normalidad.</li>
+</ol>
+
+<blockquote>Si pasó bastante tiempo y no te llegan novedades, contactá al administrador de la feria.</blockquote>
+
+<hr />
+
+<h2>3. Iniciar sesión</h2>
+
+<ol>
+<li>Tocá <strong>"Iniciar sesión"</strong>.</li>
+<li>Ingresá tu <strong>correo</strong> y <strong>contraseña</strong>.</li>
+<li>Entrás a tu panel (<strong>"Mi negocio"</strong>).</li>
+</ol>
+
+<hr />
+
+<h2>4. Tu negocio</h2>
+
+<p>En la sección <strong>"Mi negocio"</strong> vas a ver el negocio que se creó automáticamente al registrarte.</p>
+
+<ol>
+<li>El negocio comienza <strong>oculto</strong> (pendiente de publicación). El <strong>administrador</strong> decide cuándo publicarlo en la página pública.</li>
+<li>Tocá <strong>"Editar"</strong> para completar la información: nombre, dirección, horario, teléfono, descripciones e imágenes (representativa y de portada).</li>
+</ol>
+
+<hr />
+
+<h2>5. Catálogos</h2>
+
+<p>En <strong>"Mis catálogos"</strong> podés subir catálogos PDF de tu negocio:</p>
+
+<ol>
+<li>Completá el <strong>título</strong> del catálogo.</li>
+<li>Seleccioná el archivo <strong>PDF</strong>.</li>
+<li>Guardá el catálogo.</li>
+</ol>
+
+<p>Los catálogos que subís quedan <strong>pendientes</strong> hasta que el administrador los apruebe. Una vez aprobados, se muestran en la página pública de tu negocio.</p>
+
+<hr />
+
+<h2>6. Productos</h2>
+
+<p>En <strong>"Mis productos"</strong> podés cargar los productos que vendés:</p>
+
+<h3>Carga individual</h3>
+<ol>
+<li><strong>Nombre</strong> (obligatorio).</li>
+<li><strong>Descripción</strong> (opcional).</li>
+<li><strong>Precio</strong>.</li>
+<li><strong>Imagen</strong> (opcional).</li>
+</ol>
+
+<h3>Carga masiva</h3>
+<p>En <strong>"Mis productos"</strong> tenés la opción de <strong>carga masiva</strong> para subir muchos productos de una vez usando un formato de <code>Nombre;Descripcion;Precio</code> (un producto por línea).</p>
+
+<h3>Visibilidad</h3>
+<ol>
+<li>Si tu negocio tiene la aprobación de productos en modo <strong>Automática</strong>, tus productos se publican al instante.</li>
+<li>Si está en modo <strong>Requiere admin</strong>, quedan pendientes hasta que el administrador los apruebe (lo vas a ver indicado).</li>
+</ol>
+
+<h3>Liquidación</h3>
+<p>El administrador puede marcar tus productos <strong>en liquidación</strong> (oferta), que se resaltan en la home y en tu negocio. Podés organizar el orden de tus productos con las flechas ↑/↓.</p>
+
+<hr />
+
+<h2>7. Perfil</h2>
+
+<p>En la sección <strong>"Perfil"</strong> podés ver la información de tu cuenta de usuario.</p>
+
+<hr />
+
+<h2>8. Buenas prácticas</h2>
+
+<ol>
+<li><strong>Completá bien los datos</strong> de tu negocio (horario, dirección, fotos) para que se vea profesional.</li>
+<li><strong>Subí catálogos y productos correctos y completos</strong>: el administrador los revisa antes de publicarlos.</li>
+<li><strong>Pedile al administrador</strong> que te publique el negocio y te cargue/o habilite el modo de aprobación de productos que te convenga.</li>
+</ol>
+
+<hr />
+
+<h2>Anexo: flujo de punta a punta</h2>
+
+<ol>
+<li>Te <strong>registrás</strong> y <strong>confirmás tu correo</strong>.</li>
+<li>El administrador <strong>aprueba tu alta</strong>.</li>
+<li>Iniciás sesión y completás tu <strong>negocio</strong> (Editar).</li>
+<li>El administrador <strong>publica tu negocio</strong>.</li>
+<li>Subís <strong>catálogos</strong> y <strong>productos</strong>.</li>
+<li>El administrador los <strong>aprueba</strong>.</li>
+<li>Todo lo aprobado se ve en la página pública.</li>
+</ol>
+
+</body></html>
