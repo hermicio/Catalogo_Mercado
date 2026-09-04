@@ -43,24 +43,46 @@ export const POST: APIRoute = async (context) => {
 
   const storageBase = import.meta.env.SUPABASE_URL!.replace(/\/$/, '') + '/storage/v1/object/public';
 
-  // Image / cover upload
+  // Image / cover upload (robusto: si una imagen falla, igual se guarda el texto)
+  let imgError: string | null = null;
   const imageFile = formData.get('image');
   const coverFile = formData.get('cover');
 
   if (imageFile instanceof File && imageFile.size > 0) {
-    const path = `businesses/${id}/image_${Date.now()}.${imageFile.name.split('.').pop()}`;
-    const { error } = await sb.storage.from('catalogos').upload(path, imageFile, { upsert: true });
-    if (!error) updates.image_url = `${storageBase}/catalogos/${path}`;
+    const path = `businesses/${id}/image_${Date.now()}.${(imageFile.name.split('.').pop() || 'jpg').toLowerCase()}`;
+    try {
+      const { error } = await sb.storage.from('catalogos').upload(path, imageFile, { upsert: true });
+      if (error) {
+        console.error('Error subiendo imagen:', error.message);
+        imgError = 'No se pudo subir la imagen de negocio';
+      } else {
+        updates.image_url = `${storageBase}/catalogos/${path}`;
+      }
+    } catch (e) {
+      console.error('Excepción subiendo imagen:', e);
+      imgError = 'No se pudo subir la imagen de negocio';
+    }
   }
 
   if (coverFile instanceof File && coverFile.size > 0) {
-    const path = `businesses/${id}/cover_${Date.now()}.${coverFile.name.split('.').pop()}`;
-    const { error } = await sb.storage.from('catalogos').upload(path, coverFile, { upsert: true });
-    if (!error) updates.cover_url = `${storageBase}/catalogos/${path}`;
+    const path = `businesses/${id}/cover_${Date.now()}.${(coverFile.name.split('.').pop() || 'jpg').toLowerCase()}`;
+    try {
+      const { error } = await sb.storage.from('catalogos').upload(path, coverFile, { upsert: true });
+      if (error) {
+        console.error('Error subiendo portada:', error.message);
+        imgError = imgError ?? 'No se pudo subir la imagen de portada';
+      } else {
+        updates.cover_url = `${storageBase}/catalogos/${path}`;
+      }
+    } catch (e) {
+      console.error('Excepción subiendo portada:', e);
+      imgError = imgError ?? 'No se pudo subir la imagen de portada';
+    }
   }
 
   await sb.from('businesses').update(updates).eq('id', id);
 
   const back = role === 'admin' ? '/admin/negocios' : '/misnegocios';
-  return context.redirect(back);
+  const msg = imgError ? '?warning=' + encodeURIComponent(imgError + ' (el resto se guardó)') : '?ok=1';
+  return context.redirect(back + msg);
 };

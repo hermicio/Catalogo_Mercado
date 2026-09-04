@@ -16,65 +16,169 @@ const { data: business } =
   role !== 'admin'
     ? await sb.from('businesses').select('*').eq('slug', slug).eq('owner_id', user!.id).single()
     : await sb.from('businesses').select('*').eq('slug', slug).single();
+
+const ok = Astro.url.searchParams.get('ok');
+const warning = Astro.url.searchParams.get('warning');
+const error = Astro.url.searchParams.get('error');
 ---
 
 <DashboardLayout title="Editar negocio" role={role} active="/misnegocios">
   {!business ? (
     <p class="text-gray-500">No encuentro ese negocio o no tienes permisos para editarlo.</p>
   ) : (
-    <form method="POST" action="/api/businesses/update" enctype="multipart/form-data" class="space-y-5 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-      <input type="hidden" name="id" value={(business as Business).id} />
+    <>
+      {error && <div class="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
+      {warning && <div class="mb-4 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-700">{warning}</div>}
+      {ok && <div class="mb-4 rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">Cambios guardados correctamente.</div>}
 
-      <div class="grid gap-5 sm:grid-cols-2">
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Nombre del negocio</label>
-          <input name="name" required value={(business as Business).name} class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" />
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Dirección / local</label>
-          <input name="address" value={(business as Business).address ?? ''} class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" />
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Horario</label>
-          <input name="schedule" value={(business as Business).schedule ?? ''} class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" />
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Teléfono</label>
-          <input name="phone" value={(business as Business).phone ?? ''} class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" />
-        </div>
-      </div>
+      <form
+        method="POST"
+        action="/api/businesses/update"
+        enctype="multipart/form-data"
+        class="space-y-5 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+      >
+        <input type="hidden" name="id" value={(business as Business).id} />
 
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Descripción corta (para la tarjeta)</label>
-        <textarea name="description_short" rows="2" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2">{(business as Business).description_short ?? ''}</textarea>
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Descripción completa</label>
-        <textarea name="description" rows="4" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2">{(business as Business).description ?? ''}</textarea>
-      </div>
-
-      <div class="grid gap-5 sm:grid-cols-2">
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Imagen representativa (dejar vacío para mantener)</label>
-          <input type="file" name="image" accept="image/*" class="mt-1 w-full text-sm" />
+        <div class="grid gap-5 sm:grid-cols-2">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Nombre del negocio</label>
+            <input name="name" required value={(business as Business).name} class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Dirección / local</label>
+            <input name="address" value={(business as Business).address ?? ''} class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Horario</label>
+            <input name="schedule" value={(business as Business).schedule ?? ''} class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Teléfono</label>
+            <input name="phone" value={(business as Business).phone ?? ''} class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" />
+          </div>
         </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Imagen de portada (dejar vacío para mantener)</label>
-          <input type="file" name="cover" accept="image/*" class="mt-1 w-full text-sm" />
-        </div>
-      </div>
 
-      {(business as Business).image_url && (
         <div>
-          <p class="mb-1 text-sm text-gray-500">Imagen actual:</p>
-          <img src={(business as Business).image_url} class="h-24 w-24 rounded-lg object-cover" />
+          <label class="block text-sm font-medium text-gray-700">Descripción corta (para la tarjeta)</label>
+          <textarea name="description_short" rows="2" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2">{(business as Business).description_short ?? ''}</textarea>
         </div>
-      )}
 
-      <button type="submit" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700">
-        Guardar cambios
-      </button>
-    </form>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Descripción completa</label>
+          <textarea name="description" rows="4" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2">{(business as Business).description ?? ''}</textarea>
+        </div>
+
+        <div class="grid gap-5 sm:grid-cols-2">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Imagen representativa</label>
+            <div class="mt-1 overflow-hidden rounded-lg bg-gray-50">
+              <img
+                id="preview-image"
+                src={(business as Business).image_url || ''}
+                alt="Imagen actual"
+                class="h-32 w-full object-cover"
+              />
+            </div>
+            <input type="file" name="image" id="file-image" accept="image/*" class="mt-2 w-full text-sm" />
+            <p class="mt-1 text-xs text-gray-400">Se comprime automáticamente. Dejá vacío para mantener la actual.</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Imagen de portada</label>
+            <div class="mt-1 overflow-hidden rounded-lg bg-gray-50">
+              <img
+                id="preview-cover"
+                src={(business as Business).cover_url || ''}
+                alt="Portada actual"
+                class="h-32 w-full object-cover"
+              />
+            </div>
+            <input type="file" name="cover" id="file-cover" accept="image/*" class="mt-2 w-full text-sm" />
+            <p class="mt-1 text-xs text-gray-400">Se comprime automáticamente. Dejá vacío para mantener la actual.</p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-4">
+          <button type="submit" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700">
+            Guardar cambios
+          </button>
+          <button type="button" id="btn-clear-preview" class="hidden rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-600 hover:bg-gray-100">
+            Quitar vista previa
+          </button>
+        </div>
+      </form>
+    </>
   )}
 </DashboardLayout>
+
+<script>
+  const form = document.querySelector('form[action="/api/businesses/update"]');
+  if (!form) throw new Error('form no encontrado');
+
+  const clearBtn = document.getElementById('btn-clear-preview');
+
+  function compress(file: File): Promise<File> {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 1600;
+        let { width, height } = img;
+        if (width > MAX || height > MAX) {
+          const ratio = Math.min(MAX / width, MAX / height);
+          width = Math.round(width * ratio);
+          height = Math.round(height * ratio);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return resolve(file);
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) return resolve(file);
+            resolve(new File([blob], file.name.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' }));
+          },
+          'image/jpeg',
+          0.82
+        );
+      };
+      img.onerror = () => reject(new Error('No se pudo leer la imagen'));
+      img.src = URL.createObjectURL(file);
+    });
+  }
+
+  function setupImageField(fileInput: HTMLInputElement, preview: HTMLImageElement) {
+    fileInput.addEventListener('change', async () => {
+      const file = fileInput.files?.[0];
+      if (!file) return;
+      const fallback = preview.src;
+      try {
+        const compressed = await compress(file);
+        const dt = new DataTransfer();
+        dt.items.add(compressed);
+        fileInput.files = dt.files;
+        preview.src = URL.createObjectURL(compressed);
+        clearBtn?.classList.remove('hidden');
+      } catch {
+        preview.src = fallback;
+      }
+    });
+  }
+
+  setupImageField(
+    document.getElementById('file-image') as HTMLInputElement,
+    document.getElementById('preview-image') as HTMLImageElement
+  );
+  setupImageField(
+    document.getElementById('file-cover') as HTMLInputElement,
+    document.getElementById('preview-cover') as HTMLImageElement
+  );
+
+  clearBtn?.addEventListener('click', () => {
+    (document.getElementById('file-image') as HTMLInputElement).value = '';
+    (document.getElementById('file-cover') as HTMLInputElement).value = '';
+    (document.getElementById('preview-image') as HTMLImageElement).removeAttribute('src');
+    (document.getElementById('preview-cover') as HTMLImageElement).removeAttribute('src');
+    clearBtn.classList.add('hidden');
+  });
+</script>

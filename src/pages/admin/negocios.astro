@@ -12,10 +12,14 @@ const [bizResult, usersResult] = await Promise.all([
 const businesses = (bizResult.data ?? []) as Business[];
 const users = usersResult.error ? [] : usersResult.data.users;
 const error = Astro.url.searchParams.get('error');
+const ok = Astro.url.searchParams.get('ok');
+const warning = Astro.url.searchParams.get('warning');
 ---
 
 <DashboardLayout title="Gestionar negocios" role="admin" active="/admin/negocios">
   {error && <div class="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
+  {warning && <div class="mb-4 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-700">{warning}</div>}
+  {ok && <div class="mb-4 rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">Cambios guardados correctamente.</div>}
 
   <form method="POST" action="/api/admin/businesses/create" class="mb-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
     <h2 class="mb-4 font-semibold text-gray-900">Crear nuevo negocio</h2>
