@@ -44,9 +44,14 @@ const owns = (userId: string) =>
                 <p class="font-medium text-gray-900">{u.email}</p>
                 <p class="text-xs text-gray-400">{u.email_confirmed_at ? 'Verificado' : 'Sin confirmar'}</p>
                 {role !== 'admin' && (
-                  <span class={`mt-1 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${u.app_metadata?.approved === false ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'}`}>
-                    {u.app_metadata?.approved === false ? 'Pendiente de aprobaci\u00f3n' : 'Aprobado'}
-                  </span>
+                  <>
+                    {u.app_metadata?.status === 'restricted' && (
+                      <span class="mt-1 mr-1 inline-block rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">Restringido</span>
+                    )}
+                    <span class={`mt-1 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${u.app_metadata?.approved === false ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'}`}>
+                      {u.app_metadata?.approved === false ? 'Pendiente de aprobaci\u00f3n' : 'Aprobado'}
+                    </span>
+                  </>
                 )}
               </td>
               <td class="px-4 py-3">
@@ -80,6 +85,37 @@ const owns = (userId: string) =>
                     <input type="hidden" name="user_id" value={u.id} />
                     <button type="submit" class="rounded-lg border border-amber-300 px-3 py-1.5 text-sm font-semibold text-amber-700 hover:bg-amber-50">
                       Aprobar alta
+                    </button>
+                  </form>
+                )}
+
+                {role !== 'admin' && (
+                  <form method="POST" action="/api/admin/users/set_access" class="mt-2 flex justify-end">
+                    <input type="hidden" name="user_id" value={u.id} />
+                    <input type="hidden" name="status" value={u.app_metadata?.status === 'restricted' ? 'active' : 'restricted'} />
+                    <button
+                      type="submit"
+                      class={`rounded-lg border px-3 py-1.5 text-sm font-semibold ${
+                        u.app_metadata?.status === 'restricted'
+                          ? 'border-emerald-300 text-emerald-700 hover:bg-emerald-50'
+                          : 'border-red-300 text-red-700 hover:bg-red-50'
+                      }`}
+                    >
+                      {u.app_metadata?.status === 'restricted' ? 'Restablecer acceso' : 'Restringir acceso'}
+                    </button>
+                  </form>
+                )}
+
+                {role !== 'admin' && (
+                  <form
+                    method="POST"
+                    action="/api/admin/users/delete"
+                    class="mt-2 flex justify-end"
+                    onsubmit="return confirm('¿Eliminar este usuario y su negocio? Esta acción no se puede deshacer.')"
+                  >
+                    <input type="hidden" name="user_id" value={u.id} />
+                    <button type="submit" class="rounded-lg border border-red-300 px-3 py-1.5 text-sm font-semibold text-red-700 hover:bg-red-50">
+                      Eliminar usuario
                     </button>
                   </form>
                 )}

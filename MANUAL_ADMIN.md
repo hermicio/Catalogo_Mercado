@@ -69,6 +69,17 @@ Cada negocio tiene un parámetro de **aprobación de productos**:
 
 Usá el botón **“Cambiar”** junto a ese badge para alternar entre ambos modos por negocio.
 
+### 4.5 Eliminar un negocio
+Cada negocio tiene un botón **“Eliminar”** (rojo) en la columna de acciones.
+
+> ⚠️ Es una acción **definitiva**: el negocio y **todos sus catálogos y productos** se borran de forma permanente. No se puede deshacer.
+
+1. Tocá **“Eliminar”** en la fila del negocio.
+2. Confirmá en el cuadro de diálogo.
+3. El negocio y sus dependencias quedan borrados.
+
+Usalo solo cuando estés seguro de que el negocio ya no corresponde o fue creado por error.
+
 ---
 
 ## 5. Gestionar usuarios (`/admin/usuarios`)

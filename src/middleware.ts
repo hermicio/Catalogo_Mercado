@@ -13,6 +13,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   // Determine role from app_metadata (set only via service role key, tamper-proof)
   const role = (user?.app_metadata?.role as string) ?? (user?.user_metadata?.role as string) ?? 'puestero';
   const approved = user?.app_metadata?.approved !== false;
+  const restricted = user?.app_metadata?.status === 'restricted';
 
   const isPublic =
     pathname === '/' ||
@@ -20,14 +21,16 @@ export const onRequest = defineMiddleware(async (context, next) => {
     pathname === '/login' ||
     pathname === '/registro' ||
     pathname === '/pendiente' ||
+    pathname === '/restringido' ||
     pathname === '/auth/confirm' ||
     pathname === '/api/auth/login' ||
     pathname === '/api/auth/register' ||
+    pathname === '/api/messages/create' ||
     pathname.startsWith('/_astro') ||
     pathname.startsWith('/favicon');
 
   if (isPublic) {
-    if ((pathname === '/login' || pathname === '/registro') && user && approved) {
+    if ((pathname === '/login' || pathname === '/registro') && user && approved && !restricted) {
       return context.redirect(role === 'admin' ? '/admin/dashboard' : '/misnegocios');
     }
     return next();
@@ -40,6 +43,11 @@ export const onRequest = defineMiddleware(async (context, next) => {
   // Los puesteros no aprobados no pueden entrar a zonas protegidas.
   if (role !== 'admin' && !approved) {
     return context.redirect('/pendiente');
+  }
+
+  // Usuario con acceso restringido no entra a zonas protegidas.
+  if (role !== 'admin' && restricted) {
+    return context.redirect('/restringido');
   }
 
   if (pathname.startsWith('/admin') && role !== 'admin') {
