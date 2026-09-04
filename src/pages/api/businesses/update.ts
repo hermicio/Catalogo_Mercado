@@ -25,19 +25,39 @@ export const POST: APIRoute = async (context) => {
   }
 
   // Permission check: admin can edit any, puestero only their own
+  const { data: current } = await sb
+    .from('businesses')
+    .select('owner_id, slug, name')
+    .eq('id', id)
+    .single();
+
   if (role !== 'admin') {
-    const { data: check } = await sb
-      .from('businesses')
-      .select('owner_id')
-      .eq('id', id)
-      .single();
-    if (!check || check.owner_id !== user.id) {
+    if (!current || current.owner_id !== user.id) {
       return context.redirect('/misnegocios');
     }
   }
 
-  let slug = name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  // Solo se regenera el slug si el nombre cambió. Así no cambia la URL del negocio
+  // al guardar otros datos (y se evitan colisiones de slug entre negocios).
+  let slug: string;
+  const sameName = current && current.name.trim().toLowerCase() === name.toLowerCase();
+  if (current && sameName) {
+    slug = current.slug;
+  } else {
+    slug = name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    if (!slug) slug = 'negocio';
+    // Si el slug ya lo tiene OTRO negocio, desambigua para no chocar con la constraint única.
+    const { data: slugConflict } = await sb
+      .from('businesses')
+      .select('id')
+      .eq('slug', slug)
+      .neq('id', id)
+      .limit(1);
+    if (slugConflict && slugConflict.length > 0) {
+      slug = slug + '-' + Math.random().toString(36).slice(2, 7);
+    }
+  }
 
   const updates: Record<string, unknown> = { name, slug, address, schedule, phone, description, description_short };
 
