@@ -80,9 +80,24 @@ export const POST: APIRoute = async (context) => {
     }
   }
 
-  await sb.from('businesses').update(updates).eq('id', id);
+  const { data: updateResult, error: updateError } = await sb
+    .from('businesses')
+    .update(updates)
+    .eq('id', id)
+    .select('owner_id');
 
   const back = role === 'admin' ? '/admin/negocios' : '/misnegocios';
+
+  if (updateError) {
+    console.error('Error actualizando negocio:', updateError.message);
+    return context.redirect(back + '?error=' + encodeURIComponent('No se pudo guardar: ' + updateError.message));
+  }
+
+  if (!updateResult || updateResult.length === 0) {
+    console.error('Update afectó 0 filas (id=' + id + ', user=' + user.id + ', role=' + role + ')');
+    return context.redirect(back + '?error=' + encodeURIComponent('No se pudo guardar: el negocio no está asignado a tu cuenta o no tienes permisos.'));
+  }
+
   const msg = imgError ? '?warning=' + encodeURIComponent(imgError + ' (el resto se guardó)') : '?ok=1';
   return context.redirect(back + msg);
 };

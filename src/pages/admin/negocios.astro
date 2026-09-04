@@ -14,12 +14,14 @@ const users = usersResult.error ? [] : usersResult.data.users;
 const error = Astro.url.searchParams.get('error');
 const ok = Astro.url.searchParams.get('ok');
 const warning = Astro.url.searchParams.get('warning');
+const deleted = Astro.url.searchParams.get('deleted');
 ---
 
 <DashboardLayout title="Gestionar negocios" role="admin" active="/admin/negocios">
   {error && <div class="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
   {warning && <div class="mb-4 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-700">{warning}</div>}
   {ok && <div class="mb-4 rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">Cambios guardados correctamente.</div>}
+  {deleted && <div class="mb-4 rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">Negocio eliminado.</div>}
 
   <form method="POST" action="/api/admin/businesses/create" class="mb-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
     <h2 class="mb-4 font-semibold text-gray-900">Crear nuevo negocio</h2>
@@ -101,6 +103,12 @@ const warning = Astro.url.searchParams.get('warning');
                   <a href={`/misnegocios/editar/${b.slug}`} class="rounded-lg border border-emerald-200 px-3 py-1.5 text-sm text-emerald-700 hover:bg-emerald-50">
                     Editar
                   </a>
+                  <form method="POST" action="/api/admin/businesses/delete" class="inline" onsubmit="return confirm('¿Eliminar este negocio? Se borrarán también sus catálogos y productos.')">
+                    <input type="hidden" name="id" value={b.id} />
+                    <button type="submit" class="rounded-lg border border-red-200 px-3 py-1.5 text-sm text-red-700 hover:bg-red-50">
+                      Eliminar
+                    </button>
+                  </form>
                 </div>
               </td>
             </tr>
