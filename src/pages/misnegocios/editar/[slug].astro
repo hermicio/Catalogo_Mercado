@@ -58,6 +58,15 @@ const socialLinks: SocialLink[] = b?.social_links ?? [];
           <div>
             <label class="block text-sm font-medium text-gray-700">Teléfono</label>
             <input name="phone" value={(business as Business).phone ?? ''} class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" />
+            <label class="mt-2 flex items-center gap-2 text-sm text-gray-600">
+              <input
+                type="checkbox"
+                name="show_phone"
+                checked={(business as Business).show_phone !== false || undefined}
+                class="h-4 w-4 rounded border-gray-300"
+              />
+              Mostrar teléfono en la portada
+            </label>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700">WhatsApp <span class="font-normal text-gray-400">(número con código de país)</span></label>

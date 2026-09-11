@@ -17,6 +17,7 @@ export const POST: APIRoute = async (context) => {
   const address = String(formData.get('address') ?? '');
   const schedule = String(formData.get('schedule') ?? '');
   const phone = String(formData.get('phone') ?? '');
+  const show_phone = String(formData.get('show_phone') ?? '') === 'on';
   const whatsapp = String(formData.get('whatsapp') ?? '').trim();
   const whatsapp_message = String(formData.get('whatsapp_message') ?? '').trim();
   const description = String(formData.get('description') ?? '');
@@ -74,7 +75,7 @@ export const POST: APIRoute = async (context) => {
     }
   }
 
-  const updates: Record<string, unknown> = { name, slug, address, schedule, phone, whatsapp, whatsapp_message, social_links, description, description_short };
+  const updates: Record<string, unknown> = { name, slug, address, schedule, phone, show_phone, whatsapp, whatsapp_message, social_links, description, description_short };
 
   const storageBase = import.meta.env.SUPABASE_URL!.replace(/\/$/, '') + '/storage/v1/object/public';
 

@@ -25,6 +25,7 @@ export interface Business {
   address?: string;
   schedule?: string;
   phone?: string;
+  show_phone?: boolean;
   whatsapp?: string;
   whatsapp_message?: string;
   social_links?: SocialLink[];

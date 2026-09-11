@@ -83,7 +83,7 @@ const socials = (Array.isArray(b.social_links) ? b.social_links : [])
               <dd class="mt-1 text-gray-600">{b.schedule}</dd>
             </div>
           )}
-          {b.phone && (
+          {b.phone && b.show_phone !== false && (
             <div>
               <dt class="font-semibold text-gray-900">Teléfono</dt>
               <dd class="mt-1 text-gray-600">{b.phone}</dd>
