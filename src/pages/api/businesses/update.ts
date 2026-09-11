@@ -17,8 +17,23 @@ export const POST: APIRoute = async (context) => {
   const address = String(formData.get('address') ?? '');
   const schedule = String(formData.get('schedule') ?? '');
   const phone = String(formData.get('phone') ?? '');
+  const whatsapp = String(formData.get('whatsapp') ?? '').trim();
+  const whatsapp_message = String(formData.get('whatsapp_message') ?? '').trim();
   const description = String(formData.get('description') ?? '');
   const description_short = String(formData.get('description_short') ?? '');
+
+  let social_links: { label?: string; url?: string }[] = [];
+  try {
+    const parsed = JSON.parse(String(formData.get('social_links') ?? '[]'));
+    if (Array.isArray(parsed)) {
+      social_links = parsed
+        .filter((l) => l && typeof l === 'object' && (l.url as string)?.trim())
+        .map((l) => ({ label: String(l.label ?? '').trim(), url: String(l.url ?? '').trim() }))
+        .slice(0, 20);
+    }
+  } catch {
+    social_links = [];
+  }
 
   if (!id || !name) {
     return context.redirect('/misnegocios?error=Datos%20incompletos');
@@ -59,7 +74,7 @@ export const POST: APIRoute = async (context) => {
     }
   }
 
-  const updates: Record<string, unknown> = { name, slug, address, schedule, phone, description, description_short };
+  const updates: Record<string, unknown> = { name, slug, address, schedule, phone, whatsapp, whatsapp_message, social_links, description, description_short };
 
   const storageBase = import.meta.env.SUPABASE_URL!.replace(/\/$/, '') + '/storage/v1/object/public';
 

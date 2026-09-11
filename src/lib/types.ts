@@ -10,6 +10,11 @@ export const getRole = (user: { app_metadata?: Record<string, unknown>; user_met
   return role === 'admin' ? 'admin' : 'puestero';
 };
 
+export interface SocialLink {
+  label?: string;
+  url?: string;
+}
+
 export interface Business {
   id: string;
   name: string;
@@ -20,6 +25,9 @@ export interface Business {
   address?: string;
   schedule?: string;
   phone?: string;
+  whatsapp?: string;
+  whatsapp_message?: string;
+  social_links?: SocialLink[];
   cover_url?: string;
   is_visible: boolean;
   products_auto_visible?: boolean;

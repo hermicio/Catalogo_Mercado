@@ -1,7 +1,7 @@
 ---
 import DashboardLayout from '../../../layouts/DashboardLayout.astro';
 import { getRole } from '../../../lib/types';
-import type { Business } from '../../../lib/types';
+import type { Business, SocialLink } from '../../../lib/types';
 
 interface Props {
   slug: string;
@@ -20,6 +20,9 @@ const { data: business } =
 const ok = Astro.url.searchParams.get('ok');
 const warning = Astro.url.searchParams.get('warning');
 const error = Astro.url.searchParams.get('error');
+
+const b = business as Business | null;
+const socialLinks: SocialLink[] = b?.social_links ?? [];
 ---
 
 <DashboardLayout title="Editar negocio" role={role} active="/misnegocios">
@@ -56,6 +59,24 @@ const error = Astro.url.searchParams.get('error');
             <label class="block text-sm font-medium text-gray-700">Teléfono</label>
             <input name="phone" value={(business as Business).phone ?? ''} class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" />
           </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">WhatsApp <span class="font-normal text-gray-400">(número con código de país)</span></label>
+            <input name="whatsapp" value={(business as Business).whatsapp ?? ''} placeholder="5491100000000" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Mensaje para el chat de WhatsApp <span class="font-normal text-gray-400">(opcional)</span></label>
+            <input name="whatsapp_message" value={(business as Business).whatsapp_message ?? ''} placeholder="Hola, vi tu negocio en la feria..." class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Redes sociales</label>
+          <p class="mt-1 text-xs text-gray-400">Agregá tus redes (Instagram, Facebook, TikTok, etc.). Cada una con el link completo y que comience con https://</p>
+          <input type="hidden" name="social_links" id="social-links-input" />
+          <div id="social-list" data-links={JSON.stringify(socialLinks)} class="mt-2 space-y-2"></div>
+          <button type="button" id="btn-add-social" class="mt-3 rounded-lg border border-dashed border-gray-300 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50">
+            + Agregar red social
+          </button>
         </div>
 
         <div>
@@ -181,4 +202,64 @@ const error = Astro.url.searchParams.get('error');
     (document.getElementById('preview-cover') as HTMLImageElement).removeAttribute('src');
     clearBtn.classList.add('hidden');
   });
+
+  // ---- Redes sociales ----
+  const socialInput = document.getElementById('social-links-input') as HTMLInputElement;
+  const socialList = document.getElementById('social-list') as HTMLDivElement;
+  const addSocialBtn = document.getElementById('btn-add-social') as HTMLButtonElement;
+  const links = (JSON.parse(socialList.dataset.links ?? '[]') as Array<{ label?: string; url?: string }>).map((l) => ({
+    label: l?.label ?? '',
+    url: l?.url ?? '',
+  }));
+
+  function syncSocial() {
+    socialInput.value = JSON.stringify(links.filter((l) => l.label.trim() || l.url.trim()));
+  }
+
+  function renderSocial() {
+    socialList.innerHTML = '';
+    links.forEach((link, idx) => {
+      const row = document.createElement('div');
+      row.className = 'flex flex-col gap-2 sm:flex-row';
+
+      const label = document.createElement('input');
+      label.type = 'text';
+      label.value = link.label;
+      label.placeholder = 'Red (ej. Instagram)';
+      label.className = 'sm:w-44 rounded-lg border border-gray-300 px-3 py-2 text-sm';
+      label.addEventListener('input', () => {
+        links[idx].label = label.value;
+        syncSocial();
+      });
+
+      const url = document.createElement('input');
+      url.type = 'text';
+      url.value = link.url;
+      url.placeholder = 'https://instagram.com/tu_usuario';
+      url.className = 'flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm';
+      url.addEventListener('input', () => {
+        links[idx].url = url.value;
+        syncSocial();
+      });
+
+      const remove = document.createElement('button');
+      remove.type = 'button';
+      remove.textContent = 'Quitar';
+      remove.className = 'rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-red-600';
+      remove.addEventListener('click', () => {
+        links.splice(idx, 1);
+        renderSocial();
+      });
+
+      row.append(label, url, remove);
+      socialList.appendChild(row);
+    });
+    syncSocial();
+  }
+
+  addSocialBtn.addEventListener('click', () => {
+    links.push({ label: '', url: '' });
+    renderSocial();
+  });
+  renderSocial();
 </script>
