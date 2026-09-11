@@ -33,6 +33,18 @@ Cuando confirmás tu correo, tu cuenta queda **en estado de espera**. El adminis
 
 ---
 
+## 2.1. Acceso restringido
+
+En algunos casos el administrador puede **restringir temporalmente tu acceso** a la plataforma (por ejemplo si hay que regularizar algo de tu cuenta o de tus publicaciones).
+
+- Si intentás iniciar sesión con el acceso restringido, **no vas a entrar al panel**: se te muestra una pantalla de **"Acceso restringido"**.
+- En esa pantalla podés **dejar un mensaje al administrador** (asunto + mensaje) explicando tu situación.
+- El administrador recibe tu mensaje en su bandeja y, cuando lo procese, puede **restablecer tu acceso**.
+
+> Si ya no podés entrar y necesitás recuperar tu cuenta, usá el **formulario de mensaje** de la pantalla "Acceso restringido" para contactar al administrador. Cuidá los datos de tu cuenta y respetá las reglas de la feria.
+
+---
+
 ## 3. Iniciar sesión
 
 1. Tocá **"Iniciar sesión"**.

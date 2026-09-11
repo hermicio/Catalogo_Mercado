@@ -47,7 +47,8 @@
 <tbody>
 <tr><td><strong>Resumen</strong></td><td>Indicadores generales (negocios totales/publicados, usuarios, catálogos pendientes) y accesos rápidos.</td></tr>
 <tr><td><strong>Negocios</strong></td><td>Crear, editar, publicar/ocultar y configurar la aprobación de productos de cada negocio.</td></tr>
-<tr><td><strong>Usuarios</strong></td><td>Aprobar las altas de puesteros nuevos, ver los registrados y asignarles (o quitarles) un negocio.</td></tr>
+<tr><td><strong>Usuarios</strong></td><td>Aprobar las altas de puesteros nuevos, ver los registrados, asignarles (o quitarles) un negocio, restringirles el acceso o eliminarlos.</td></tr>
+<tr><td><strong>Mensajes</strong></td><td>Bandeja de mensajes que envían los puesteros con acceso restringido para recuperar su cuenta.</td></tr>
 <tr><td><strong>Catálogos</strong></td><td>Aprobar/rechazar los catálogos PDF que suben los puesteros.</td></tr>
 <tr><td><strong>Productos</strong></td><td>Aprobar productos, marcarlos en liquidación y ocultarlos/eliminarlos.</td></tr>
 <tr><td><strong>Página principal</strong></td><td>Editar el título, subtítulo y foto de fondo de la portada de la home.</td></tr>
@@ -104,6 +105,19 @@
 
 <p>Usá el botón <strong>“Cambiar”</strong> junto a ese badge para alternar entre ambos modos por negocio.</p>
 
+<h3>4.5 Eliminar un negocio</h3>
+<p>Cada negocio tiene un botón <strong>“Eliminar”</strong> (rojo) en la columna de acciones.</p>
+
+<blockquote>⚠️ Es una acción <strong>definitiva</strong>: el negocio y <strong>todos sus catálogos y productos</strong> se borran de forma permanente. No se puede deshacer.</blockquote>
+
+<ol>
+<li>Tocá <strong>“Eliminar”</strong> en la fila del negocio.</li>
+<li>Confirmá en el cuadro de diálogo.</li>
+<li>El negocio y sus dependencias quedan borrados.</li>
+</ol>
+
+<p>Usalo solo cuando estés seguro de que el negocio ya no corresponde o fue creado por error.</p>
+
 <hr />
 
 <h2>5. Gestionar usuarios (<code>/admin/usuarios</code>)</h2>
@@ -137,6 +151,29 @@
 </ol>
 
 <blockquote>Los usuarios con rol <code>admin</code> no se pueden reasignar desde esta tabla.</blockquote>
+
+<h3>Restringir / restablecer el acceso de un puestero</h3>
+
+<p>Podés <strong>dar de baja temporal</strong> a un puestero, por ejemplo si incumple las reglas de la feria, sin borrar su cuenta ni su negocio.</p>
+
+<ol>
+<li>En la fila del usuario (que no sea admin), tocá <strong>“Restringir acceso”</strong> (rojo).</li>
+<li>El usuario verá el badge <strong>“Restringido”</strong>.</li>
+<li>Desde ese momento, si intenta iniciar sesión, <strong>no entra al panel</strong>: se le muestra una pantalla de “Acceso restringido” con un <strong>formulario de mensaje</strong> para comunicarse con vos.</li>
+</ol>
+
+<p>Para revertirlo tocá <strong>“Restablecer acceso”</strong> (verde) en esa misma fila.</p>
+
+<h3>Eliminar un usuario</h3>
+
+<blockquote>⚠️ Es una acción <strong>definitiva</strong>: se borran la cuenta del usuario <strong>y su negocio</strong> (con catálogos y productos). No se puede deshacer.</blockquote>
+
+<ol>
+<li>Tocá <strong>“Eliminar usuario”</strong> (rojo) en la fila correspondiente.</li>
+<li>Confirmá en el cuadro de diálogo.</li>
+</ol>
+
+<blockquote>No podés eliminar tu propia cuenta de administrador desde esta pantalla.</blockquote>
 
 <hr />
 
@@ -210,7 +247,28 @@
 
 <hr />
 
-<h2>10. Consejos y buenas prácticas</h2>
+<h2>10. Mensajes de usuarios (<code>/admin/mensajes</code>)</h2>
+
+<p>Aquí llegan los <strong>mensajes que envían los puesteros con acceso restringido</strong> desde la pantalla “Acceso restringido” (para recuperar su cuenta o pedir revisar su situación).</p>
+
+<p>Cada mensaje muestra:</p>
+<ol>
+<li><strong>Asunto</strong> y el <strong>mensaje</strong> completo.</li>
+<li>El <strong>email</strong> del puestero y la <strong>fecha/hora</strong> de envío.</li>
+<li>Un cartel <strong>“Nuevo”</strong> si aún no lo leíste.</li>
+</ol>
+
+<h3>Acciones por mensaje</h3>
+<ol>
+<li><strong>Marcar leído / Marcar no leído</strong>: gestioná el estado del mensaje. Recordá leer el mensaje para decidir si restablecés el acceso del puestero en <strong>Usuarios</strong> (botón “Restablecer acceso”).</li>
+<li><strong>Eliminar</strong>: borra el mensaje (confirmá antes).</li>
+</ol>
+
+<blockquote>Esto es el canal de contacto de dos vías con los puesteros bloqueados: cuando restablezcas su acceso en <code>Usuarios</code>, él podrá volver a entrar y verás resuelto el motivo del mensaje.</blockquote>
+
+<hr />
+
+<h2>11. Consejos y buenas prácticas</h2>
 
 <ol>
 <li><strong>Revisá los pendientes seguido</strong>: altas de puesteros, catálogos y productos pendientes representan trabajo esperando tu aprobación.</li>

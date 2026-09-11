@@ -23,7 +23,8 @@ En la columna izquierda del panel aparecen estas secciones:
 |---|---|
 | **Resumen** | Indicadores generales (negocios totales/publicados, usuarios, catálogos pendientes) y accesos rápidos. |
 | **Negocios** | Crear, editar, publicar/ocultar y configurar la aprobación de productos de cada negocio. |
-| **Usuarios** | Aprobar las altas de puesteros nuevos, ver los registrados y asignarles (o quitarles) un negocio. |
+| **Usuarios** | Aprobar las altas de puesteros nuevos, ver los registrados, asignarles (o quitarles) un negocio, restringirles el acceso o eliminarlos. |
+| **Mensajes** | Bandeja de mensajes que envían los puesteros con acceso restringido para recuperar su cuenta. |
 | **Catálogos** | Aprobar/rechazar los catálogos PDF que suben los puesteros. |
 | **Productos** | Aprobar productos, marcarlos en liquidación y ocultarlos/eliminarlos. |
 | **Página principal** | Editar el título, subtítulo y foto de fondo de la portada de la home. |
@@ -108,6 +109,25 @@ Cuando alguien crea una cuenta y confirma su correo, su cuenta queda **pendiente
 
 > Los usuarios con rol `admin` no se pueden reasignar desde esta tabla.
 
+### Restringir / restablecer el acceso de un puestero
+
+Podés **dar de baja temporal** a un puestero, por ejemplo si incumple las reglas de la feria, sin borrar su cuenta ni su negocio.
+
+1. En la fila del usuario (que no sea admin), tocá **“Restringir acceso”** (rojo).
+2. El usuario verá el badge **“Restringido”**.
+3. Desde ese momento, si intenta iniciar sesión, **no entra al panel**: se le muestra una pantalla de “Acceso restringido” con un **formulario de mensaje** para comunicarse con vos.
+
+Para revertirlo tocá **“Restablecer acceso”** (verde) en esa misma fila.
+
+### Eliminar un usuario
+
+> ⚠️ Es una acción **definitiva**: se borran la cuenta del usuario **y su negocio** (con catálogos y productos). No se puede deshacer.
+
+1. Tocá **“Eliminar usuario”** (rojo) en la fila correspondiente.
+2. Confirmá en el cuadro de diálogo.
+
+> No podés eliminar tu propia cuenta de administrador desde esta pantalla.
+
 ---
 
 ## 6. Aprobar catálogos (`/admin/catalogos`)
@@ -168,7 +188,24 @@ Tocá **“Eliminar”** en la fila correspondiente y confirmá. Las fechas pasa
 
 ---
 
-## 10. Consejos y buenas prácticas
+## 10. Mensajes de usuarios (`/admin/mensajes`)
+
+Aquí llegan los **mensajes que envían los puesteros con acceso restringido** desde la pantalla “Acceso restringido” (para recuperar su cuenta o pedir revisar su situación).
+
+Cada mensaje muestra:
+- **Asunto** y el **mensaje** completo.
+- El **email** del puestero y la **fecha/hora** de envío.
+- Un cartel **“Nuevo”** si aún no lo leíste.
+
+### Acciones por mensaje
+- **Marcar leído / Marcar no leído**: gestioná el estado del mensaje. Recordá leer el mensaje para decidir si restablecés el acceso del puestero en **Usuarios** (botón “Restablecer acceso”).
+- **Eliminar**: borra el mensaje (confirmá antes).
+
+> Esto es el canal de contacto de dos vías con los puesteros bloqueados: cuando restablezcas su acceso en `Usuarios`, él podrá volver a entrar y verás resuelto el motivo del mensaje.
+
+---
+
+## 11. Consejos y buenas prácticas
 
 - **Revisá los pendientes seguido**: altas de puesteros, catálogos y productos pendientes representan trabajo esperando tu aprobación.
 - **Probalo todo en la vista pública**: cada vez que publiques/ocultes algo, entrá a “Ver sitio público” para confirmar cómo se ve.
