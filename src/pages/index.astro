@@ -10,7 +10,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
 const todayISO = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
 
 const [bizResult, settingsResult, saleResult, fairResult] = await Promise.all([
-  sb.from('businesses').select('*').eq('is_visible', true).order('name'),
+  sb.from('businesses').select('*').eq('is_visible', true).order('sort_order', { ascending: true }).order('name', { ascending: true }),
   sb.from('site_settings').select('*').eq('id', 1).maybeSingle(),
   sb.from('products').select('*, businesses!inner(name, slug)').eq('on_sale', true).eq('is_visible', true).order('sort_order', { ascending: true }).order('created_at', { ascending: false }),
   sb.from('fair_dates').select('*').gte('fair_date', todayISO).order('fair_date'),

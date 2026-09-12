@@ -32,6 +32,7 @@ export interface Business {
   cover_url?: string;
   is_visible: boolean;
   products_auto_visible?: boolean;
+  sort_order?: number;
   owner_id?: string;
   created_at: string;
 }
