@@ -44,7 +44,7 @@ const deleted = Astro.url.searchParams.get('deleted');
     </button>
   </form>
 
-  <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+  <div class="overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-sm">
     <table class="min-w-full divide-y divide-gray-200">
       <thead class="bg-gray-50">
         <tr>
@@ -62,7 +62,7 @@ const deleted = Astro.url.searchParams.get('deleted');
           return (
             <tr>
               <td class="px-4 py-3">
-                <div class="flex items-center gap-1">
+                <div class="flex items-center gap-1 whitespace-nowrap">
                   <form method="POST" action="/api/admin/businesses/reorder">
                     <input type="hidden" name="id" value={b.id} />
                     <input type="hidden" name="dir" value="top" />
@@ -113,19 +113,19 @@ const deleted = Astro.url.searchParams.get('deleted');
                 </div>
               </td>
               <td class="px-4 py-3 text-right">
-                <div class="flex justify-end gap-2">
+                <div class="flex flex-wrap items-center justify-end gap-1.5 whitespace-normal">
                   <form method="POST" action="/api/admin/businesses/toggle">
                     <input type="hidden" name="id" value={b.id} />
-                    <button type="submit" class="rounded-lg border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100">
+                    <button type="submit" class="rounded-lg border border-gray-300 px-2.5 py-1.5 text-sm text-gray-700 hover:bg-gray-100 whitespace-nowrap">
                       {b.is_visible ? 'Ocultar' : 'Publicar'}
                     </button>
                   </form>
-                  <a href={`/misnegocios/editar/${b.slug}`} class="rounded-lg border border-emerald-200 px-3 py-1.5 text-sm text-emerald-700 hover:bg-emerald-50">
+                  <a href={`/misnegocios/editar/${b.slug}`} class="whitespace-nowrap rounded-lg border border-emerald-200 px-2.5 py-1.5 text-sm text-emerald-700 hover:bg-emerald-50">
                     Editar
                   </a>
                   <form method="POST" action="/api/admin/businesses/delete" class="inline" onsubmit="return confirm('¿Eliminar este negocio? Se borrarán también sus catálogos y productos.')">
                     <input type="hidden" name="id" value={b.id} />
-                    <button type="submit" class="rounded-lg border border-red-200 px-3 py-1.5 text-sm text-red-700 hover:bg-red-50">
+                    <button type="submit" class="whitespace-nowrap rounded-lg border border-red-200 px-2.5 py-1.5 text-sm text-red-700 hover:bg-red-50">
                       Eliminar
                     </button>
                   </form>
